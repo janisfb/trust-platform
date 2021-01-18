@@ -1,0 +1,50 @@
+_format_version: "2.1"
+
+services:
+- name: data_management
+  url: http://host.docker.internal:6000
+  routes:
+  - name: hello-world
+    paths:
+    - /
+  - name: hello-world-tag
+    paths:
+    - /2
+    strip_path: false
+  - name: upload
+    paths:
+    - /api/files
+    methods: [ "POST" ]
+    strip_path: false
+
+plugins:
+- name: basic-auth
+  config: 
+    hide_credentials: false
+    anonymous: 81823632-10c0-4098-a4f7-31062520c1e6
+    # cookie_secure is true by default, and should always be true,
+    # but is set to false for the sake of this demo in order to avoid using HTTPS.
+- name: session
+  config:
+    # storage: kong
+    cookie_secure: false 
+- name: request-termination
+  consumer: anonymous_users
+  config:
+    status_code: 403
+    message: 'Forbidden for anonymous users.'
+
+consumers:
+- username: anonymous_users
+  # manually set to fixed uuid in order to use it in key-auth plugin
+  id: 81823632-10c0-4098-a4f7-31062520c1e6
+- username: test
+
+keyauth_credentials:
+- consumer: test
+  key: open
+
+basicauth_credentials:
+- consumer: test
+  username: test
+  password: open

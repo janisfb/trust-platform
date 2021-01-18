@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  data_management:
+    build: 
+      context: ./backend/data_management/
+      target: debug #debug mode with nodemon running!
+    volumes: 
+      - ./backend/data_management/src/:/work/src/
+      - ./files/:/work/files/
+    ports:
+      - 6000:6000
+
+  kong:
+    image: kong:latest
+    volumes:
+      - ./kong.yaml:/kong.yaml
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/kong.yaml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+    ports:
+      - 8000:8000 
+      - 8443:8443 
+      - 127.0.0.1:8001:8001 
+      - 127.0.0.1:8444:8444 
