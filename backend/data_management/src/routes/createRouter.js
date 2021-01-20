@@ -2,7 +2,7 @@ const glob = require("glob");
 const Router = require("express").Router;
 
 /** 
- * create routes for all the routes inside of ./api
+ * Create routes for all the routes inside of './api'.
  */ 
 module.exports = () =>
   glob
