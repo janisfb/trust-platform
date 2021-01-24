@@ -154,3 +154,6 @@ yarn-error.log
 
 # ignore files from the applications user upload directory
 /files
+
+# ignore vetur config
+vetur.config.js
