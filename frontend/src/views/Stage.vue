@@ -25,11 +25,9 @@
 
       <template #end>
         <b-navbar-item tag="div">
-          <div class="buttons">           
-            <a class="button is-light">
-              Logout
-            </a>
-          </div>
+          <b-button class="is-light">
+            Logout
+          </b-button>
         </b-navbar-item>
       </template>
     </b-navbar>
@@ -39,7 +37,15 @@
 
 <script>
 export default {
-  name: "Stage"
+  name: "Stage",
+  methods: {
+    logout() {
+      this.$store.dispatch("logout")
+        .then(() => {
+          this.$router.push("/login")
+        });
+    },
+  }
 };
 </script>
 

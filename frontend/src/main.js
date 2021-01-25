@@ -2,15 +2,23 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Buefy from 'buefy'
+import Axios from 'axios'
+import store from './store'
 import './assets/scss/app.scss'
-
 
 Vue.use(Buefy)
 
-Vue.config.productionTip = false
+Vue.prototype.$http = Axios;
+const token = localStorage.getItem("token");
+if (token) {
+  console.log("using token")
+  Vue.prototype.$http.defaults.headers.common["Authorization"] = token;
+}
 
+Vue.config.productionTip = false
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

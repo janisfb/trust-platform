@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from "./../store.js";
 import Home from '../views/Home.vue'
 import Stage from "../views/Stage.vue"
 import Logs from "../views/Logs.vue"
@@ -16,13 +17,17 @@ const routes = [
         path: "",
         name: "Home",
         component: Home,
-        auth: true,
+        meta: {
+          requiresAuth: true
+        }
       },
       {
         path: "logs",
         name: "Logs",
         component: Logs,
-        auth: true,
+        meta: {
+          requiresAuth: true
+        }
       },
     ],
   },
@@ -39,6 +44,21 @@ const router = new VueRouter({
   routes,
   linkActiveClass: "is-active",
 });
+
+router.beforeEach((to, from, next) => {
+  console.log("checking route:", to.path);
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    console.log("Login required! Logged in?", store.getters.isLoggedIn);
+    if(store.getters.isLoggedIn) {
+      next();
+      return;
+    } else {
+      next("/login");
+    }
+  } else {
+    next();
+  }
+})
 
 // router.beforeEach(function(to, from, next) {
 //   console.log(

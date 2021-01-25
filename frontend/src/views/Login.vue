@@ -10,7 +10,7 @@
           </section>
           <section class="input-panel add-padding">
             <b-field label="Benutzer">
-                <b-input v-model="name"></b-input>
+                <b-input v-model="username"></b-input>
             </b-field>
 
             <b-field label="Passwort">
@@ -59,13 +59,13 @@
 </template>
 
 <script>
-import AuthService from '@/services/AuthService.js';
+// import AuthService from '@/services/AuthService.js';
 
 export default {
   name: "Login",
   data: function() {
     return {
-      name: "",
+      username: "",
       password: "",
       isLoading: false,
       isFullPage: true
@@ -73,14 +73,14 @@ export default {
   },
   methods: {
     loginAsAdmin() {
-      this.name = "admin";
+      this.username = "admin";
       this.password = "admin";
 
       this.login();
     },
     
     loginAsUser() {
-      this.name = "test";
+      this.username = "test";
       this.password = "test";
 
       this.login();
@@ -91,6 +91,12 @@ export default {
       setTimeout(() => {
           this.isLoading = false
       }, 10 * 1000);
+
+      let username = this.username;
+      let password = this.password;
+      this.$store.dispatch("login", {username, password})
+        .then(() => this.$router.push("/"))
+        .catch(error => console.log(error));
     },
   }
 }

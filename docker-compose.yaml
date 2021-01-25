@@ -11,6 +11,15 @@ services:
     ports:
       - 6000:6000
 
+  # frontend:
+  #   build:
+  #     context: ./frontend/
+  #     target: debug #debug mode with serve
+  #   volumes:
+  #     - ./frontend/src/:/work/src/
+  #   ports: 
+  #     - 8080:8080
+
   kong:
     image: kong:latest
     volumes:
