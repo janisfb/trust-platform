@@ -96,7 +96,21 @@ export default {
       let password = this.password;
       this.$store.dispatch("login", {username, password})
         .then(() => this.$router.push("/"))
-        .catch(error => console.log(error));
+        .catch(error => {
+          this.isLoading = false;
+          this.openFailedToast();
+          console.log(error);
+        });
+    },
+
+    openFailedToast() {
+      this.$buefy.toast.open({
+          duration: 4000,
+          message: "Falscher Nutzername oder falsches Passwort!",
+          position: "is-bottom",
+          type: "is-danger",
+          queue: false,
+      })
     },
   }
 }
@@ -130,6 +144,5 @@ export default {
   .h-100 {
     height: 100%;
   }
-
 }
 </style>

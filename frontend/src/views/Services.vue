@@ -4,7 +4,7 @@
       <div class="columns">
         <div class="column">
           <div class="box fill-height">
-            This is logs.
+            <ServiceExplorer></ServiceExplorer>
           </div>
         </div>
       </div>
@@ -13,10 +13,12 @@
 </template>
 
 <script>
+import ServiceExplorer from "@/components/ServiceExplorer"
 
 export default {
-  name: "Logs",
+  name: "Services",
   components: {
+    ServiceExplorer,
   },
 }
 </script>

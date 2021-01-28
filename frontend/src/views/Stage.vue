@@ -10,6 +10,9 @@
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           Dateien
         </b-navbar-item>
+        <b-navbar-item tag="router-link" :to="{ path: '/services' }">
+          Services
+        </b-navbar-item>
         <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
           Souveränität
         </b-navbar-item>
@@ -25,7 +28,9 @@
 
       <template #end>
         <b-navbar-item tag="div">
-          <b-button class="is-light">
+          <h1 v-bind:class="{ 'has-text-primary': isAdmin }">{{username}}</h1>
+          <h1 class="pl-5 pr-5">|</h1>
+          <b-button class="is-light" @click="logout()">
             Logout
           </b-button>
         </b-navbar-item>
@@ -38,12 +43,20 @@
 <script>
 export default {
   name: "Stage",
+  computed: {
+    username() {
+      return this.$store.state.username;
+    },
+    isAdmin() {
+      return this.$store.state.username === "admin";
+    }
+  },
   methods: {
-    logout() {
+    async logout() {
+      console.log("Logout requested!")
       this.$store.dispatch("logout")
-        .then(() => {
-          this.$router.push("/login")
-        });
+        .then(() => this.$router.push("/login"))
+        .catch(error => console.log(error));
     },
   }
 };

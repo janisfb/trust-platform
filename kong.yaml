@@ -35,17 +35,24 @@ plugins:
   config:
     # storage: kong
     cookie_secure: false 
+    cookie_samesite: "off"
 - name: request-termination
   consumer: anonymous_users
   config:
     status_code: 403
     message: 'Forbidden for anonymous users.'
 - name: cors
+  enabled: true
   config: 
     origins: 
-    - "http://localhost:8080"
-    preflight_continue: false
+    - "*"
+    preflight_continue: true
     max_age: 3600
+    credentials: true
+    exposed_headers:
+    - "set-cookie"
+    headers: 
+    - "*"
 
 consumers:
 - username: anonymous_users
@@ -63,7 +70,7 @@ keyauth_credentials:
 basicauth_credentials:
 - consumer: test
   username: test
-  password: open
+  password: test
 - consumer: admin
   username: admin
   password: admin

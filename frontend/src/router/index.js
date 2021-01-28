@@ -4,6 +4,7 @@ import store from "./../store.js";
 import Home from '../views/Home.vue'
 import Stage from "../views/Stage.vue"
 import Logs from "../views/Logs.vue"
+import Services from "../views/Services.vue";
 import Login from "../views/Login.vue"
 
 Vue.use(VueRouter)
@@ -18,16 +19,24 @@ const routes = [
         name: "Home",
         component: Home,
         meta: {
-          requiresAuth: true
-        }
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "services",
+        name: "Services",
+        component: Services,
+        meta: {
+          requiresAuth: true,
+        },
       },
       {
         path: "logs",
         name: "Logs",
         component: Logs,
         meta: {
-          requiresAuth: true
-        }
+          requiresAuth: true,
+        },
       },
     ],
   },
