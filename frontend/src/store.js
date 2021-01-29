@@ -9,20 +9,39 @@ export default new Vuex.Store({
     status: "",
     token: localStorage.getItem("token") || "",
     username: localStorage.getItem("username") || "",
+    isAdmin: false,
   },
   mutations: {
+    /**
+     * Sets the status to the pending state.
+     * @param {*} state 
+     */
     auth_request(state) {
       state.status = "loading";
     },
+    /**
+     * Sets the status to the success state.
+     * @param {*} state 
+     * @param {{String, String}} param1 Obj containing token and username 
+     */
     auth_success(state, { token, username }) {
       console.log("last step", username);
       state.status = "success";
       state.token = token;
       state.username = username;
+      state.isAdmin = username == "admin";
     },
+    /**
+     * Sets the status to the error state.
+     * @param {*} state 
+     */
     auth_error(state) {
       state.status = "error";
     },
+    /**
+     * Sets the status to the initial state (logged out).
+     * @param {*} state 
+     */
     logout(state) {
       state.status = "";
       state.token = "";
@@ -30,6 +49,13 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    /**
+     * Performs the login at the Kong Gateway.
+     * 
+     * @param {*} param0 
+     * @param {{String, String}} user The credentials of the user.
+     * @returns 
+     */
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit("auth_request");
@@ -99,6 +125,12 @@ export default new Vuex.Store({
           });
       });
     },
+    /**
+     * Performs the logout at the Kong Gateway.
+     * 
+     * @param {*} param0 
+     * @returns
+     */
     logout({ commit }) {
       return new Promise((resolve) => {
         commit("logout");
@@ -113,7 +145,17 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    /**
+     * Retrieves if the user is logged in.
+     * @param {*} state 
+     * @returns 
+     */
     isLoggedIn: (state) => !!state.token,
+    /**
+     * Retrieves the current status of the auth process.
+     * @param {*} state  
+     * @returns The current status.
+     */
     authStatus: (state) => state.status,
   },
 });

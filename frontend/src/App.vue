@@ -6,6 +6,9 @@
 
 <script>
 export default {
+  /**
+   * Performs a login check on the created hook. 
+   */
   created: function () {
     this.$http.interceptors.response.use(undefined, function (err) {
       return new Promise(function () {

@@ -1,6 +1,6 @@
 <template>
   <div class="login-panel">
-    <div class="tile is-ancestor">      
+    <div class="tile is-ancestor">
       <div class="tile is-parent">
         <div class="tile is-child box no-padding">
           <section class="hero is-light">
@@ -10,24 +10,29 @@
           </section>
           <section class="input-panel add-padding">
             <b-field label="Benutzer">
-                <b-input v-model="username"></b-input>
+              <b-input v-model="username"></b-input>
             </b-field>
 
             <b-field label="Passwort">
-                <b-input type="password"
-                    v-model="password"
-                    password-reveal>
-                </b-input>
+              <b-input type="password" v-model="password" password-reveal>
+              </b-input>
             </b-field>
 
             <b-button @click="login()">Login</b-button>
 
-            <b-loading :is-full-page="isFullPage" v-model="isLoading" :can-cancel="true"></b-loading>
+            <b-loading
+              :is-full-page="isFullPage"
+              v-model="isLoading"
+              :can-cancel="true"
+            ></b-loading>
           </section>
         </div>
       </div>
       <div class="tile is-5 is-vertical is-parent">
-        <div class="tile is-child box no-padding quick-login-card" @click="loginAsAdmin()">
+        <div
+          class="tile is-child box no-padding quick-login-card"
+          @click="loginAsAdmin()"
+        >
           <div class="hero is-primary h-100">
             <div class="hero-body">
               <div class="container">
@@ -41,7 +46,10 @@
             </div>
           </div>
         </div>
-        <div class="tile is-child box no-padding quick-login-card" @click="loginAsUser()">
+        <div
+          class="tile is-child box no-padding quick-login-card"
+          @click="loginAsUser()"
+        >
           <div class="hero-body">
             <div class="container">
               <h1 class="title">
@@ -59,61 +67,71 @@
 </template>
 
 <script>
-// import AuthService from '@/services/AuthService.js';
-
 export default {
-  name: "Login",
+  name: "LoginView",
   data: function() {
     return {
       username: "",
       password: "",
+      // vars for the loading dialog
       isLoading: false,
-      isFullPage: true
-    }
+      isFullPage: true,
+    };
   },
   methods: {
+    /**
+     * Performs login as admin.
+     */
     loginAsAdmin() {
       this.username = "admin";
       this.password = "admin";
 
       this.login();
     },
-    
+    /**
+     * Performs login as test user.
+     */
     loginAsUser() {
       this.username = "test";
       this.password = "test";
 
       this.login();
     },
-
+    /**
+     * Triggers the login with the current values for
+     * username and password.
+     */
     async login() {
       this.isLoading = true;
       setTimeout(() => {
-          this.isLoading = false
+        this.isLoading = false;
       }, 10 * 1000);
 
       let username = this.username;
       let password = this.password;
-      this.$store.dispatch("login", {username, password})
+      this.$store
+        .dispatch("login", { username, password })
         .then(() => this.$router.push("/"))
-        .catch(error => {
+        .catch((error) => {
           this.isLoading = false;
           this.openFailedToast();
           console.log(error);
         });
     },
-
+    /**
+     * Opens a toast with information about a failed login.
+     */
     openFailedToast() {
       this.$buefy.toast.open({
-          duration: 4000,
-          message: "Falscher Nutzername oder falsches Passwort!",
-          position: "is-bottom",
-          type: "is-danger",
-          queue: false,
-      })
+        duration: 4000,
+        message: "Falscher Nutzername oder falsches Passwort!",
+        position: "is-bottom",
+        type: "is-danger",
+        queue: false,
+      });
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>

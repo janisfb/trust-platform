@@ -13,12 +13,10 @@
 </template>
 
 <script>
-
 export default {
-  name: "Logs",
-  components: {
-  },
-}
+  name: "LogsView",
+  components: {},
+};
 </script>
 
 <style lang="scss" scoped>

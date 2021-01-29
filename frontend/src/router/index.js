@@ -1,23 +1,21 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from "./../store.js";
-import Home from '../views/Home.vue'
+import FileView from "../views/FileView.vue";
 import Stage from "../views/Stage.vue"
-import Logs from "../views/Logs.vue"
-import Services from "../views/Services.vue";
-import Login from "../views/Login.vue"
+import ServicesView from "../views/ServicesView.vue";
+import LogsView from "../views/LogsView.vue";
+import Login from "../views/LoginView.vue"
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
+const routes = [{
     path: "/",
     component: Stage,
-    children: [
-      {
+    children: [{
         path: "",
         name: "Home",
-        component: Home,
+        component: FileView,
         meta: {
           requiresAuth: true,
         },
@@ -25,7 +23,7 @@ const routes = [
       {
         path: "services",
         name: "Services",
-        component: Services,
+        component: ServicesView,
         meta: {
           requiresAuth: true,
         },
@@ -33,7 +31,7 @@ const routes = [
       {
         path: "logs",
         name: "Logs",
-        component: Logs,
+        component: LogsView,
         meta: {
           requiresAuth: true,
         },
@@ -54,11 +52,15 @@ const router = new VueRouter({
   linkActiveClass: "is-active",
 });
 
+/**
+ * Guard for every requiresAuth meta entry.
+ * -> Re-Route to /login if no user is currently logged in.
+ */
 router.beforeEach((to, from, next) => {
   console.log("checking route:", to.path);
-  if(to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
     console.log("Login required! Logged in?", store.getters.isLoggedIn);
-    if(store.getters.isLoggedIn) {
+    if (store.getters.isLoggedIn) {
       next();
       return;
     } else {
@@ -68,37 +70,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 })
-
-// router.beforeEach(function(to, from, next) {
-//   console.log(
-//     "beforeEach",
-//     to.path + " - Auth: " + this.$store.getters.isLoggedIn
-//   );
-//   if (
-//     to.path !== "/login" &&
-//     to.path !== "login" &&
-//     !this.$store.getters.isLoggedIn
-//   ) {
-//     next({ path: "/login" });
-//   } else if (
-//     (to.path === "/login" || to.path === "login") &&
-//     this.$store.getters.isLoggedIn
-//   ) {
-//     next({ path: "/" });
-//   } else {
-//     next();
-//   }
-// });
-
-// // Whenerver Server Gives 401 Status Code, it logouts and redirect to login page
-// Vue.http.interceptors.push(function (request, next) {
-//   next(function (response) {
-//     if (response.status === 401) {
-//       let msg = response.body.returnMessage
-//       localStorage.setItem('logoutReason', msg)
-//       auth.logout()
-//     }
-//   })
-// })
 
 export default router

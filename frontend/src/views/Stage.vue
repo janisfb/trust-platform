@@ -1,11 +1,13 @@
 <template>
   <div id="main-panel">
     <b-navbar class="p-3">
+
       <template #brand>
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <b-icon class="rotated" icon="cctv" size="is-medium"> </b-icon>
         </b-navbar-item>
       </template>
+
       <template #start>
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           Dateien
@@ -16,26 +18,20 @@
         <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
           Souveränität
         </b-navbar-item>
-        <!-- <b-navbar-dropdown label="Info">
-                <b-navbar-item href="#">
-                    About
-                </b-navbar-item>
-                <b-navbar-item href="#">
-                    Contact
-                </b-navbar-item>
-            </b-navbar-dropdown> -->
       </template>
 
       <template #end>
         <b-navbar-item tag="div">
-          <h1 v-bind:class="{ 'has-text-primary': isAdmin }">{{username}}</h1>
+          <h1 v-bind:class="{ 'has-text-primary': isAdmin }">{{ username }}</h1>
           <h1 class="pl-5 pr-5">|</h1>
           <b-button class="is-light" @click="logout()">
             Logout
           </b-button>
         </b-navbar-item>
       </template>
+
     </b-navbar>
+    
     <router-view />
   </div>
 </template>
@@ -44,21 +40,35 @@
 export default {
   name: "Stage",
   computed: {
+    /**
+     * Returns the username of the current user.
+     *
+     * @returns {String} The username.
+     */
     username() {
       return this.$store.state.username;
     },
+    /**
+     * Returns if the current user is admin.
+     *
+     * @returns {Boolean} True if the current user is admin.
+     */
     isAdmin() {
-      return this.$store.state.username === "admin";
-    }
+      return this.$store.state.isAdmin;
+    },
   },
   methods: {
+    /**
+     * Performs a logout.
+     */
     async logout() {
-      console.log("Logout requested!")
-      this.$store.dispatch("logout")
+      console.log("Logout requested!");
+      this.$store
+        .dispatch("logout")
         .then(() => this.$router.push("/login"))
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     },
-  }
+  },
 };
 </script>
 
@@ -83,6 +93,6 @@ export default {
 }
 
 .router-link-exact-active {
-	font-weight: bold;
+  font-weight: bold;
 }
 </style>

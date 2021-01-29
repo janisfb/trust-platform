@@ -4,21 +4,25 @@
       <div class="columns">
         <div class="column is-narrow">
           <div class="box fill-height" style="width: 15vw;">
-            <Upload-File></Upload-File>
+            <file-upload-component></file-upload-component>
             <section>
-              <hr>
+              <hr />
               <div class="control pl-4" style="text-align: left;">
                 <b-switch v-model="onlyOwnFiles">Nur eigene Dateien</b-switch>
-                <b-switch class="pt-3" v-model="showSearch">Suchleiste anzeigen</b-switch>
+                <b-switch class="pt-3" v-model="showSearch">
+                  Suchleiste anzeigen
+                </b-switch>
               </div>
             </section>
           </div>
         </div>
         <div class="column">
           <div class="box fill-height">
-            <File-Explorer 
-              :onlyOwnFiles="onlyOwnFiles"
-              :showSearch="showSearch"></File-Explorer>
+            <file-list-component
+              :only-own-files="onlyOwnFiles"
+              :show-search="showSearch"
+            >
+            </file-list-component>
           </div>
         </div>
       </div>
@@ -27,22 +31,22 @@
 </template>
 
 <script>
-import UploadFile from "@/components/UploadFile.vue"
-import FileExplorer from "@/components/FileExplorer"
+import FileUploadComponent from "@/components/FileUploadComponent.vue";
+import FileListComponent from "@/components/FileListComponent";
 
 export default {
-  name: 'Home',
+  name: "FileView",
   components: {
-    UploadFile,
-    FileExplorer
+    FileUploadComponent,
+    FileListComponent,
   },
   data() {
     return {
       onlyOwnFiles: false,
-      showSearch: true
-    }
-  }
-}
+      showSearch: true,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>

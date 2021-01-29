@@ -3,27 +3,29 @@
     <section class="hero is-light">
       <div class="hero-body">
         <div class="title" style="display:flex;">
-          <h1>{{serviceElement.name}}</h1>
-          <b-tag type="is-info ml-5" style="align-self:center;">{{serviceElement.version}}</b-tag>
+          <h1>{{ serviceElement.name }}</h1>
+          <b-tag type="is-info ml-5" style="align-self:center;">
+            {{ serviceElement.version }}
+          </b-tag>
         </div>
         <div class="subtitle">
-          <h1>Von {{serviceElement.creator}}</h1>
+          <h1>Von {{ serviceElement.creator }}</h1>
         </div>
       </div>
     </section>
     <section class="add-padding">
-      {{serviceElement.description}}
+      {{ serviceElement.description }}
     </section>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ServiceDetailView',
+  name: "ServiceDetailView",
   props: {
     serviceElement: Object,
-  }
-}
+  },
+};
 </script>
 
 <style>

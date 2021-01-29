@@ -4,7 +4,7 @@
       <div class="columns">
         <div class="column">
           <div class="box fill-height">
-            <ServiceExplorer></ServiceExplorer>
+            <service-list-component></service-list-component>
           </div>
         </div>
       </div>
@@ -13,14 +13,14 @@
 </template>
 
 <script>
-import ServiceExplorer from "@/components/ServiceExplorer"
+import ServiceListComponent from "../components/ServiceListComponent.vue";
 
 export default {
-  name: "Services",
+  name: "ServicesView",
   components: {
-    ServiceExplorer,
+    ServiceListComponent,
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
