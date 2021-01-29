@@ -9,7 +9,7 @@ export default new Vuex.Store({
     status: "",
     token: localStorage.getItem("token") || "",
     username: localStorage.getItem("username") || "",
-    isAdmin: false,
+    isAdmin: localStorage.getItem("username") != null ? localStorage.getItem("username") === "admin" : false,
   },
   mutations: {
     /**
