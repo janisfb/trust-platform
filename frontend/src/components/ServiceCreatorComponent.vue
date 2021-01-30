@@ -201,14 +201,14 @@
               </b-tag>
             </div>
             <h1 class="mt-2" style="text-align: left;">Herausgeber: {{ contact.company }}</h1>
-            <li 
+            <ul 
               v-if="sovereignty.usesExternalService || sovereignty.needsFullAccess" 
               class="box active-border has-text-danger mt-2" 
               style="text-align: left;"
             >
-              <ul v-if="sovereignty.needsFullAccess">Benötigt vollständigen Datenzugriff</ul>
-              <ul v-if="sovereignty.usesExternalService">Nutzt externen Service: {{ sovereignty.externalService.name }}</ul>
-            </li>
+              <li v-if="sovereignty.needsFullAccess">+ Benötigt vollständigen Datenzugriff</li>
+              <li v-if="sovereignty.usesExternalService">+ Nutzt externen Service: {{ sovereignty.externalService.name }}</li>
+            </ul>
           </div>
           <span v-if="fileError != ''" class="has-text-danger">{{ fileError }}</span>
           <div class="level pt-3">
@@ -259,7 +259,7 @@ export default {
       fileError: "",
 
       // config für b-steps
-      activeStep: 0,
+      activeStep: 2,
       isStepsClickable: false,
       hasNavigation: true,
       mobileMode: 'minimalist',
