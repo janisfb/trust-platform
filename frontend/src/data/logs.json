@@ -1,0 +1,42 @@
+[
+  {
+    "time": "2021-01-30T12:33:42Z",
+    "severity": "info",
+    "category": "file_operation",
+    "action": "created",
+    "session": "08BaswoAAQgAADVDG3IAAAAD",
+    "user": "admin",
+    "sourceip": "10.240.46.16",
+    "object": "Radwege.txt[405wf73skk60ndt9]"
+  },
+  {
+    "time": "2021-01-20T12:33:42Z",
+    "severity": "info",
+    "category": "file_operation",
+    "action": "created",
+    "session": "0123dwoAAQwdxDVDG3I123AD",
+    "user": "test",
+    "sourceip": "15.240.42.11",
+    "object": "AndereDatei.txt[405wf73s2380ndt9]"
+  },
+  {
+    "time": "2021-01-30T14:33:42Z",
+    "severity": "warning",
+    "category": "file_operation",
+    "action": "deleted",
+    "session": "08BaswoAAQgAADVDG3IAAAAD",
+    "user": "admin",
+    "sourceip": "10.240.46.16",
+    "object": "Radwege.txt[405wf73skk60ndt9]"
+  },
+  {
+    "time": "2021-02-01T10:12:43Z",
+    "severity": "info",
+    "category": "file_operation",
+    "action": "created",
+    "session": "08BaswoasdwfsVDG3IAAAAD",
+    "user": "admin",
+    "sourceip": "10.240.46.16",
+    "object": "NeueDatei123.js[123wf7kkasd157dt9]"
+  }
+]

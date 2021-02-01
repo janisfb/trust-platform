@@ -30,27 +30,26 @@
         @click="(row) => launchServiceInfoModal(row)"
       >
         <b-table-column
-          class="ta"
-          field="name"
+          field="serviceMeta.name"
           label="Service"
           v-slot="props"
           :width="550"
         >
-          <div class="ta">{{ props.row.name }}</div>
+          <div class="ta">{{ props.row.serviceMeta.name }}</div>
         </b-table-column>
 
-        <b-table-column field="creator" label="Anbieter" v-slot="props">
-          <div class="ta">{{ props.row.creator }}</div>
+        <b-table-column field="contact.company" label="Anbieter" v-slot="props">
+          <div class="ta">{{ props.row.contact.company }}</div>
         </b-table-column>
 
         <b-table-column
-          field="version"
+          field="serviceMeta.version"
           label="Version"
           centered
           v-slot="props"
           :width="100"
         >
-          <b-tag type="is-info">{{ props.row.version }}</b-tag>
+          <b-tag type="is-info">{{ props.row.serviceMeta.version }}</b-tag>
         </b-table-column>
 
         <b-table-column field="" centered v-slot="props" :width="50">
@@ -79,7 +78,7 @@
 </template>
 
 <script>
-const data = require("@/data/sampleService.json");
+const data = require("@/data/service.json");
 import ServiceInfoComponent from "@/components/ServiceInfoComponent";
 import ServiceCreatorComponent from "./ServiceCreatorComponent.vue";
 
@@ -119,7 +118,7 @@ export default {
      * @returns {Boolean} True if the current user is admin.
      */
     isAdmin() {
-      return this.$store.state.isAdmin;
+      return this.$store.getters.isAdmin;
     },
     /**
      * Computes the per-page for the table depending on the screen size.
@@ -145,9 +144,9 @@ export default {
       var dataFiltered = [];
       for (var i in this.data) {
         if (
-          this.data[i].name.match(name_re) ||
-          this.data[i].creator.match(name_re) ||
-          this.data[i].version.match(name_re)
+          this.data[i].serviceMeta.name.match(name_re) ||
+          this.data[i].contact.company.match(name_re) ||
+          this.data[i].serviceMeta.version.match(name_re)
         ) {
           dataFiltered.push(this.data[i]);
         }

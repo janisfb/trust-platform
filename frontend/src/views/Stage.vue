@@ -54,7 +54,7 @@ export default {
      * @returns {Boolean} True if the current user is admin.
      */
     isAdmin() {
-      return this.$store.state.isAdmin;
+      return this.$store.getters.isAdmin;
     },
   },
   methods: {

@@ -1,0 +1,90 @@
+[
+  {
+    "contact": {
+      "company": "Speedy Ltd.",
+      "url": "example.com",
+      "email": "info@example.com",
+      "tel": "0123 4567890"
+    },
+    "serviceMeta": {
+      "name": "Speedy Scan",
+      "version": "7.2.8",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptuaAt vero eos et accusam et justo duo dolores."
+    },
+    "sovereignty": {
+      "needsFullAccess": true,
+      "accessReason": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr.",
+      "usesExternalService": true,
+      "externalService": {
+        "name": "Beispiel-PaaS",
+        "reason": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr."
+      }
+    }
+  },
+  {
+    "contact": {
+      "company": "Bsp. Soft",
+      "url": "example.com",
+      "email": "info@example.com",
+      "tel": "0123 4567890"
+    },
+    "serviceMeta": {
+      "name": "BspFrame",
+      "version": "1.1.0",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptuaAt vero eos et accusam et justo duo dolores."
+    },
+    "sovereignty": {
+      "needsFullAccess": true,
+      "accessReason": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr.",
+      "usesExternalService": false,
+      "externalService": {
+        "name": "Not Applicable",
+        "reason": "Not Applicable"
+      }
+    }
+  },
+  {
+    "contact": {
+      "company": "Datalytics",
+      "url": "example.com",
+      "email": "info@example.com",
+      "tel": "0123 4567890"
+    },
+    "serviceMeta": {
+      "name": "Analyzer",
+      "version": "1.9.0",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptuaAt vero eos et accusam et justo duo dolores."
+    },
+    "sovereignty": {
+      "needsFullAccess": false,
+      "accessReason": "Not Applicable",
+      "usesExternalService": false,
+      "externalService": {
+        "name": "Not Applicable",
+        "reason": "Not Applicable"
+      }
+    }
+  },
+  {
+    "contact": {
+      "company": "geoExperts e.g.",
+      "url": "example.com",
+      "email": "info@example.com",
+      "tel": "0123 4567890"
+    },
+    "serviceMeta": {
+      "name": "3D-gen e.g.",
+      "version": "0.22.3",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptuaAt vero eos et accusam et justo duo dolores."
+    },
+    "sovereignty": {
+      "needsFullAccess": false,
+      "accessReason": "Not Applicable",
+      "usesExternalService": true,
+      "externalService": {
+        "name": "Beispiel-PaaS",
+        "reason": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr."
+      }
+    }
+  }
+]

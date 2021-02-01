@@ -7,54 +7,83 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     status: "",
+    fileStatus: "",
     token: localStorage.getItem("token") || "",
     username: localStorage.getItem("username") || "",
-    isAdmin: localStorage.getItem("username") != null ? localStorage.getItem("username") === "admin" : false,
+    files: [],
+    // isAdmin: localStorage.getItem("username") != null ? localStorage.getItem("username") === "admin" : false,
   },
+
   mutations: {
     /**
      * Sets the status to the pending state.
-     * @param {*} state 
+     * @param {*} state
      */
     auth_request(state) {
       state.status = "loading";
     },
     /**
      * Sets the status to the success state.
-     * @param {*} state 
-     * @param {{String, String}} param1 Obj containing token and username 
+     * @param {*} state
+     * @param {{String, String}} param1 Obj containing token and username
      */
     auth_success(state, { token, username }) {
       console.log("last step", username);
       state.status = "success";
       state.token = token;
       state.username = username;
-      state.isAdmin = username == "admin";
+      // state.isAdmin = username == "admin";
     },
     /**
      * Sets the status to the error state.
-     * @param {*} state 
+     * @param {*} state
      */
     auth_error(state) {
       state.status = "error";
     },
     /**
      * Sets the status to the initial state (logged out).
-     * @param {*} state 
+     * @param {*} state
      */
     logout(state) {
       state.status = "";
       state.token = "";
       state.user = "";
     },
+
+    /**
+     * Sets the status of file requests to the pending state.
+     * @param {*} state
+     */
+    file_request(state) {
+      state.fileStatus = "loading";
+    },
+    /**
+     * Sets the status of file requests to the error state.
+     * @param {*} state
+     */
+    file_error(state) {
+      state.fileStatus = "error";
+    },
+    /**
+     * Sets the status of file requests to the success state.
+     * @param {*} state
+     * @param {any[]} param1 List containing the file obj.
+     */
+    file_success(state, files) {
+      console.log(files);
+      state.files = files;
+      state.fileStatus = "success";
+    },
   },
+
   actions: {
     /**
      * Performs the login at the Kong Gateway.
-     * 
-     * @param {*} param0 
+     *
+     * @param {*} param0
      * @param {{String, String}} user The credentials of the user.
-     * @returns 
+     * @returns
      */
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
@@ -127,8 +156,8 @@ export default new Vuex.Store({
     },
     /**
      * Performs the logout at the Kong Gateway.
-     * 
-     * @param {*} param0 
+     *
+     * @param {*} param0
      * @returns
      */
     logout({ commit }) {
@@ -143,19 +172,60 @@ export default new Vuex.Store({
         resolve();
       });
     },
+
+    /**
+     * Gets the files from the data_management service
+     *
+     * @param {*} param0
+     * @returns A list containing the file information.
+     */
+    getFiles({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit("file_request");
+        axios({
+          url: "/api/files",
+          method: "get",
+          responseType: "json",
+          withCredentials: true,
+        })
+          .then((resp) => {
+            console.log(resp);
+            commit("file_success", resp.data);
+          })
+          .catch((err) => {
+            console.log("Something went wrong while fetching the files!");
+            commit("file_error");
+            reject(err);
+          });
+      });
+    },
   },
+
   getters: {
     /**
      * Retrieves if the user is logged in.
-     * @param {*} state 
-     * @returns 
+     * @param {*} state
+     * @returns true if the user is logged in.
      */
     isLoggedIn: (state) => !!state.token,
     /**
      * Retrieves the current status of the auth process.
-     * @param {*} state  
+     * @param {*} state
      * @returns The current status.
      */
     authStatus: (state) => state.status,
+    /**
+     * Retrieves if the user is the admin.
+     * @param {*} state
+     * @returns true if the user is the admin.
+     */
+    isAdmin: (state) => state.username === "admin",
+
+    /**
+     * Retrieves the files.
+     * @param {*} state
+     * @returns A list containing the files.
+     */
+    getFiles: (state) => state.files,
   },
 });

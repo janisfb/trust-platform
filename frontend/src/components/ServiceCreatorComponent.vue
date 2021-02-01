@@ -67,7 +67,8 @@
             </ValidationProvider> 
 
             <div class="next-btn">
-              <b-button @click="handleSubmit(nextStep)">Weiter</b-button>
+              <b-button icon-right="fast-forward" class="mr-1" @click="fillWithExampleValues()">Beispielwerte</b-button>
+              <b-button class="ml-1" @click="handleSubmit(nextStep)">Weiter</b-button>
             </div>
           </ValidationObserver>
         </b-step-item>
@@ -115,7 +116,7 @@
               </b-field>
             </ValidationProvider>
 
-            <div class="next-btn columns">
+            <div class="next-btn">
               <b-button class="mr-1" @click="prevStep()">Zurück</b-button>
               <b-button class="ml-1" @click="handleSubmit(nextStep)">Weiter</b-button>
             </div>
@@ -183,7 +184,7 @@
                 </ValidationProvider>
               </div>
             </div>
-            <div class="next-btn columns">
+            <div class="next-btn">
               <b-button class="mr-1" @click="prevStep()">Zurück</b-button>
               <b-button class="ml-1" @click="handleSubmit(nextStep)">Weiter</b-button>
             </div>
@@ -193,32 +194,36 @@
         <b-step-item step="3" label="Beenden" :clickable="isStepsClickable">
           <h1 class="title has-text-centered">Hochladen & Beenden</h1>
           <div class="box">
-            <div style="display:flex;">
-              Servicename: 
-              <h1 class="ml-3">{{ serviceMeta.name }}</h1>
+            <h1 class="summary-title">Zusammenfassung:</h1>
+            <div style="display:flex;"> 
+              <h1>Servicename: {{ serviceMeta.name }}</h1>
               <b-tag type="is-info ml-2" style="align-self:center;">
                 {{ serviceMeta.version }}
               </b-tag>
             </div>
             <h1 class="mt-2" style="text-align: left;">Herausgeber: {{ contact.company }}</h1>
-            <ul 
-              v-if="sovereignty.usesExternalService || sovereignty.needsFullAccess" 
-              class="box active-border has-text-danger mt-2" 
-              style="text-align: left;"
-            >
-              <li v-if="sovereignty.needsFullAccess">+ Benötigt vollständigen Datenzugriff</li>
-              <li v-if="sovereignty.usesExternalService">+ Nutzt externen Service: {{ sovereignty.externalService.name }}</li>
-            </ul>
+            <div v-if="sovereignty.needsFullAccess || sovereignty.usesExternalService">
+              <b-message class="mt-2 mb-0 pb-0" v-if="sovereignty.needsFullAccess" type="is-danger">
+                <p>Service benötigt vollständigen Datenzugriff.</p>
+                <!-- <b-button class="mt-2" size="is-small">Mehr dazu</b-button> -->
+              </b-message>
+              <b-message class="pt-0" v-if="sovereignty.usesExternalService" type="is-danger">
+                <p>Service nutzt einen externen Service.</p>
+                <!-- <b-button class="mt-2" size="is-small">Mehr dazu</b-button> -->
+              </b-message>
+            </div>
           </div>
-          <span v-if="fileError != ''" class="has-text-danger">{{ fileError }}</span>
-          <div class="level pt-3">
+          <div class="level pt-3 pb-0 mb-2">
             <div style="width: 75%;">
                 <b-field class="file">
                   <b-upload 
                     v-model="file" 
                     expanded
                   >
-                    <a class="button is-primary is-fullwidth">
+                    <a 
+                      v-bind:class="{ 'has-border-danger': fileError != '' && file == null }" 
+                      class="button is-primary is-fullwidth"
+                    >
                       <b-icon icon="upload"></b-icon>
                       <span style="overflow: hidden; text-overflow: ellipsis;">{{
                         file != null ? file.name : ".js-Code hochladen"
@@ -232,8 +237,9 @@
               <b-button @click="uploadFile()">Hochladen</b-button>
             </div>
           </div>
-          <div class="next-btn columns">
-            <b-button class="mr-1" @click="prevStep()">Zurück</b-button>
+          <span v-if="fileError != '' && file == null" class="has-text-danger" style="text-align: left;">{{ fileError }}</span>
+          <div class="next-btn pt-3">
+            <b-button @click="prevStep()">Zurück</b-button>
           </div>
         </b-step-item>
       </b-steps>
@@ -259,7 +265,7 @@ export default {
       fileError: "",
 
       // config für b-steps
-      activeStep: 2,
+      activeStep: 0,
       isStepsClickable: false,
       hasNavigation: true,
       mobileMode: 'minimalist',
@@ -318,8 +324,62 @@ export default {
       if(this.file == null) {
         this.fileError="Es wurde keine Datei hochgeladen!";
       } else {
+        // fill the sovereignty field with 'Not Applicable' if they
+        // have been left unchecked.
+        if(!this.sovereignty.needsFullAccess) {
+          this.sovereignty.accessReason = "Not Applicable";
+        }
+        if(!this.sovereignty.usesExternalService) {
+          this.sovereignty.externalService.name = "Not Applicable";
+          this.sovereignty.externalService.reason = "Not Applicable";
+        }
         console.log("to the moon");
       }
+    },
+    async fillWithExampleValues() {
+      const rand = this.randomName();
+
+      this.contact = {
+        company: rand,
+        url: "example.com",
+        email: "info@example.com",
+        tel: "0123 4567890",
+      };
+
+      setTimeout(() => {
+        this.nextStep();
+      }, 500);
+
+      this.serviceMeta = {
+        name: `${rand} Service`,
+        version: `${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 20)}`,
+        description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr," +
+                    "sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua" +
+                    "At vero eos et accusam et justo duo dolores."
+      };
+
+      setTimeout(() => {
+        this.nextStep();
+      }, 500);
+
+      this.sovereignty = {
+        needsFullAccess: true,
+        accessReason: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr.",
+        usesExternalService: true,
+        externalService: {
+          name: "Beispiel-PaaS",
+          reason: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr."
+        }
+      };
+
+      setTimeout(() => {
+        this.nextStep();
+      }, 500);
+    },
+    randomName() {
+      const prefix = ["Fast", "Efficient", "Easy", "Reliable", "Rapid", "Speedy"];
+      const suffix = ["Soft", "Ltd.", "GmbH", "AG", "Group"];
+      return `${prefix[Math.floor(Math.random() * prefix.length)]} ${suffix[Math.floor(Math.random() * suffix.length)]}`;
     },
   }
 };
@@ -401,10 +461,21 @@ extend('url', {
   padding: 0.01em 16px;
 }
 
+.has-border-danger {
+  border: 2px solid $danger!important;
+}
+
 .next-btn {
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0);
-  margin-top: 5px;
+  margin-top: 7px;
+}
+
+.summary-title {
+  text-align: left;
+  font-size: 17px;
+  text-decoration: underline;
+  padding-bottom: 5px;
 }
 </style>

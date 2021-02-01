@@ -6,7 +6,11 @@
         v-model.lazy="searchQuery"
       />
     </b-field>
-    <h1 class="pt-5" v-if="data.length == 0">Keine Dateien hochgeladen!</h1>
+    <div v-if="this.fetchError != ''">
+      <h1 class="has-text-danger">{{ fetchError }}</h1>
+      <b-button @click="retryFileFetch">Dateien erneut laden</b-button>
+    </div>
+    <h1 class="pt-5" v-else-if="files.length == 0">Bisher wurden keine Dateien hochgeladen!</h1>
     <div v-else class="container">
       <b-table
         class="text-align-left"
@@ -63,7 +67,7 @@
           sortable
           v-slot="props"
         >
-          {{ props.row.fileSizeInBytes }} Bytes
+          {{ transformSizeFormat(props.row.fileSizeInBytes) }}
         </b-table-column>
 
         <b-table-column field="" centered>
@@ -136,6 +140,7 @@ export default {
       defaultOpenedDetails: [],
       // searchQuery for filter
       searchQuery: "",
+      fetchError: "",
     };
   },
   props: {
@@ -177,6 +182,14 @@ export default {
       }
     },
     /**
+     * Gets the data from the vuex store.
+     * 
+     * @returns {any[]} A list containing all fetched data.
+     */
+    files() {
+      return this.$store.getters.getFiles;
+    },
+    /**
      * Filters the data with the searchQuery.
      * Searchable: name, creator and version
      * 
@@ -185,24 +198,41 @@ export default {
     filter() {
       var name_re = new RegExp(this.searchQuery, "i");
       var dataFiltered = [];
-      for (var i in this.data) {
+      for (var i in this.files) {
         if (
-          (this.data[i].fileName.match(name_re) ||
-            this.data[i].creator.match(name_re) ||
-            new Date(this.data[i].creationTime)
+          (this.files[i].fileName.match(name_re) ||
+            this.files[i].creator.match(name_re) ||
+            new Date(this.files[i].creationTime)
               .toLocaleString()
               .match(name_re) ||
-            this.data[i].id.match(name_re)) &&
+            this.files[i].id.match(name_re)) &&
           (!this.onlyOwnFiles ||
-            (this.onlyOwnFiles && this.data[i].creator == this.username))
+            (this.onlyOwnFiles && this.files[i].creator == this.username))
         ) {
-          dataFiltered.push(this.data[i]);
+          dataFiltered.push(this.files[i]);
         }
       }
       return dataFiltered;
     },
   },
   methods: {
+    /**
+     * Formats the file size to a more readable format.
+     * https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+     */
+    transformSizeFormat(bytes) {
+      if (bytes === 0) return '0 Bytes';
+
+      const decimals = 2;
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      console.log(parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i])
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    },
     /**
      * Temp.
      * @deprecated This method is only temporary!
@@ -217,6 +247,24 @@ export default {
     closeOtherDetail(row) {
       this.defaultOpenedDetails = [row.id];
     },
+    retryFileFetch() {
+      this.$store
+        .dispatch("getFiles")
+        .catch((error) => {
+          this.fetchError = "Die Dateien konnten nicht geladen werden!";
+          console.log(error);
+        });
+      this.fetchError = "";
+    }
+  },
+  created() {
+    // if(this.$store.getters.getFiles == [])
+      this.$store
+        .dispatch("getFiles")
+        .catch((error) => {
+          this.fetchError = "Die Dateien konnten nicht geladen werden!";
+          console.log(error);
+        });
   },
 };
 </script>

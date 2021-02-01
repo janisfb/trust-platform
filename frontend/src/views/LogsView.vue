@@ -4,7 +4,7 @@
       <div class="columns">
         <div class="column">
           <div class="box fill-height">
-            This is logs.
+            <logs-list-component></logs-list-component>
           </div>
         </div>
       </div>
@@ -13,9 +13,11 @@
 </template>
 
 <script>
+import LogsListComponent from '../components/LogsListComponent.vue';
+
 export default {
   name: "LogsView",
-  components: {},
+  components: {LogsListComponent},
 };
 </script>
 
