@@ -27,13 +27,15 @@
         @dblclick="(row, index) => closeOtherDetail(row)"
       >
         <b-table-column field="fileName" label="Datei" sortable v-slot="props">
-          {{ props.row.fileName }}
+          <div style="max-width: 270px; overflow: hidden; text-overflow: ellipsis;">
+            {{ props.row.fileName }}
+          </div>
         </b-table-column>
 
         <b-table-column
           field="creator"
           label="Besitzer"
-          :width="180"
+          :width="140"
           sortable
           v-slot="props"
         >
@@ -80,25 +82,10 @@
           </b-tooltip>
         </b-table-column>
 
-        <!-- <b-table-column label="Gender" v-slot="props">
-          <b-dropdown aria-role="list is-small">
-            <template #trigger="{ active }">
-              <b-button
-                  label="Click me!"
-                  type="is-primary"
-                  :icon-right="active ? 'menu-up' : 'menu-down'" />
-            </template>
-
-
-            <b-dropdown-item aria-role="listitem" @click="doSth(props)">Action</b-dropdown-item>
-            <b-dropdown-item aria-role="listitem">Another action</b-dropdown-item>
-            <b-dropdown-item aria-role="listitem">Something else</b-dropdown-item>
-          </b-dropdown>
-        </b-table-column> -->
         <template #detail="props">
           <div class="level">
             <div class="level-left">
-              <h1>ID: {{ props.row.id.split("-")[1] }}</h1>
+              <h1>ID: {{ props.row.id }}</h1>
               <b-tag
                 class="ml-5"
                 v-if="props.row.creator != username"
@@ -112,32 +99,59 @@
             </div>
             <div class="buttons are-small">
               <b-button icon-left="file-search">Souveränitätsdaten</b-button>
-              <b-button icon-left="lock-open">Zugriff simulieren</b-button>
-              <b-button class="is-danger" icon-left="delete"
-                >Datei löschen</b-button
+              <b-button 
+                @click="launchReplaceModal()"
+                icon-left="file-replace"
+              >
+                Datei ersetzen
+              </b-button>
+              <b-button 
+                @click="confirmDelete(props.row)"
+                class="is-danger" 
+                icon-left="delete"
+              >
+                Datei löschen
+              </b-button
               >
             </div>
           </div>
-        </template>
+
+          <b-modal v-model="isReplaceModalActive" :width="400">
+            <div class="box" style="padding: 0px">
+              <section class="hero is-light">
+                <div class="hero-body">
+                  <h1 class="title">Datei ersetzen</h1>
+                  <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                </div>
+              </section>
+              <section style="padding: 1.5rem">
+                <file-upload-component :replaceId="props.row.id"></file-upload-component>
+              </section>
+            </div>
+          </b-modal>
+        </template>       
       </b-table>
     </div>
   </section>
 </template>
 
 <script>
-const data = require("@/data/sample.json");
+import axios from "axios";
+import FileUploadComponent from './FileUploadComponent.vue';
 
 export default {
+  components: { FileUploadComponent },
   name: "FileExplorer",
   data() {
     return {
       // data + config for the table
-      data,
+      data: [],
       isPaginated: true,
       currentPage: 1,
       perPage: 8,
       showDetailIcon: true,
       defaultOpenedDetails: [],
+      isReplaceModalActive: false,
       // searchQuery for filter
       searchQuery: "",
       fetchError: "",
@@ -167,6 +181,14 @@ export default {
      */
     username() {
       return this.$store.state.username;
+    },
+    /**
+     * Returns if the user is admin or not
+     *
+     * @returns {Boolean} True if the current user is admin.
+     */
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     },
     /**
      * Computes the per-page for the table depending on the screen size.
@@ -221,24 +243,16 @@ export default {
      * https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
      */
     transformSizeFormat(bytes) {
-      if (bytes === 0) return '0 Bytes';
+      if (bytes === 0) return "0 Bytes";
 
       const decimals = 2;
       const k = 1024;
       const dm = decimals < 0 ? 0 : decimals;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
       const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-      console.log(parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i])
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    },
-    /**
-     * Temp.
-     * @deprecated This method is only temporary!
-     */
-    doSth(props) {
-      console.log(props);
     },
     /**
      * Closes the other detail view by setting the
@@ -247,6 +261,15 @@ export default {
     closeOtherDetail(row) {
       this.defaultOpenedDetails = [row.id];
     },
+    /**
+     * Launches the file replace modal.
+     */
+    launchReplaceModal() {
+      this.isReplaceModalActive = true;
+    },
+    /**
+     * Tries to refetch the files.
+     */
     retryFileFetch() {
       this.$store
         .dispatch("getFiles")
@@ -255,7 +278,87 @@ export default {
           console.log(error);
         });
       this.fetchError = "";
-    }
+    },
+    /**
+     * Prompts for a confirm before deleting the file.
+     * Will delete the file when the dialog gets confirmed!
+     * 
+     * @param {*} row - The row of the file.
+     */
+    confirmDelete(row) {
+      if(row.creator != this.username) {
+        this.$buefy.dialog.confirm({
+        title: "Datei löschen",
+        message: `Die Datei wird <b>unwideruflich</b> gelöscht! Eine Bestätigung ist erforderlich.
+            <p class="pt-2"><b class="has-text-danger pt-2">Dies ist keine eigene Datei!</b></p>`,
+        cancelText: "Abbrechen",
+        confirmText: "Datei löschen",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => this.deleteFile(row.id)
+      })
+      }
+      else {
+        this.$buefy.dialog.confirm({
+          title: "Datei löschen",
+          message: `Die Datei wird <b>unwideruflich</b> gelöscht! Eine Bestätigung ist erforderlich.`,
+          cancelText: "Abbrechen",
+          confirmText: "Datei löschen",
+          type: "is-danger",
+          hasIcon: true,
+          onConfirm: () => this.deleteFile(row.id)
+        })
+      }
+    },
+    /**
+     * Deletes a file.
+     * 
+     * @param {string} id The id of the file that should be deleted.
+     */
+    deleteFile(id) {
+      return new Promise((resolve, reject) => {
+        axios.delete(`/api/files/${id}`)
+          .then((resp) => {
+            console.log(resp);            
+            this.openSuccessToast("Die Datei wurde erfolgreich gelöscht!");
+            this.$store.dispatch("getFiles");
+            resolve();
+          })
+          .catch((err) => {
+            console.log("Something went wrong while deleting the file!");
+            this.openFailedToast("Die Datei konnte nicht gelöscht werden!");
+            reject(err);
+          });
+      });
+    },
+    /**
+     * Opens error toast.
+     * 
+     * @param {string} message The message that should be shown.
+     */
+    openFailedToast(message) {
+      this.$buefy.toast.open({
+        duration: 4000,
+        message: message,
+        position: "is-bottom",
+        type: "is-danger",
+        queue: false,
+      });
+    },
+    /**
+     * Opens success toast.
+     * 
+     * @param {string} message The message that should be shown.
+     */
+    openSuccessToast(message) {
+      this.$buefy.toast.open({
+        duration: 4000,
+        message: message,
+        position: "is-top",
+        type: "is-success",
+        queue: false,
+      });
+    },
   },
   created() {
     // if(this.$store.getters.getFiles == [])

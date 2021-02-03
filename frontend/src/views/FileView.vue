@@ -8,7 +8,7 @@
             <section>
               <hr />
               <div class="control pl-4" style="text-align: left;">
-                <b-switch v-model="onlyOwnFiles">Nur eigene Dateien</b-switch>
+                <b-switch v-if="isAdmin" v-model="onlyOwnFiles">Nur eigene Dateien</b-switch>
                 <b-switch class="pt-3" v-model="showSearch">
                   Suchleiste anzeigen
                 </b-switch>
@@ -46,6 +46,16 @@ export default {
       showSearch: true,
     };
   },
+  computed: {
+    /**
+     * Returns if the user is admin or not
+     *
+     * @returns {Boolean} True if the current user is admin.
+     */
+    isAdmin() {
+      return this.$store.getters.isAdmin;
+    },
+  }
 };
 </script>
 

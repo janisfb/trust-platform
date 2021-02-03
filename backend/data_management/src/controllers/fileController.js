@@ -1,6 +1,7 @@
 var path = require("path");
 var fs = require("fs");
 var uniqid = require("uniqid");
+const glob = require("glob");
 
 var config = require("../config/config");
 
@@ -56,10 +57,17 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
     return;
   }
 
-  const fileUploadPath = path.join(config.UPLOAD_DIRECTORY, reqFileId);
+  let fileUploadPath;
+  var files = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`);
 
-  if (!fs.existsSync(fileUploadPath)) {
-    console.log(`No file found for ${reqFileId}.`);
+  console.log("file can be replaced", files)
+
+  if (files.length > 0) {
+    fileUploadPath = files[0];
+  }
+
+  if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
+    console.log(`No distinctive file found for ${reqFileId}.`);
     resCallback(404, `No file found for ${reqFileId}.`);
     return;
   }
@@ -87,10 +95,18 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
  * @param {*} resCallback The callback containing the result of the operation.
  */
 exports.deleteFile = function (reqFileId, resCallback) {
-  const fileUploadPath = path.join(config.UPLOAD_DIRECTORY, reqFileId);
+  let fileUploadPath;
 
-  if (!fs.existsSync(fileUploadPath)) {
-    console.log(`No file found for ${reqFileId}.`);
+  var files = glob.sync(
+    `${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`
+  );
+
+  if (files.length > 0) {
+    fileUploadPath = files[0];
+  }
+
+  if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
+    console.log(`No distinctive file found for ${reqFileId}.`);
     resCallback(404, `No file found for ${reqFileId}.`);
     return;
   }
@@ -141,7 +157,7 @@ const getFileInfo = (file) => {
   var fileStats = fs.statSync(filePath);
   const splittedName = file.split("-");
 
-  const id = file;
+  const id = splittedName[1];
   const fileName = splittedName[3];
   const creator = splittedName[0];
   const fileSizeInBytes = fileStats.size;
