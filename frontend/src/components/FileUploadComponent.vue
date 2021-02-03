@@ -7,7 +7,7 @@
             <p>
               <b-icon icon="upload" size="is-large"></b-icon>
             </p>
-            <p>Dateien hochladen - {{this.replaceId}}</p>
+            <p>Datei hochladen</p>
           </div>
         </section>
       </b-upload>
@@ -29,7 +29,7 @@
         </b-button>
       </div>
       <b-button
-        @click="file = {}"
+        @click="file = null"
         type="is-danger level-right"
         icon-right="delete"
       />
@@ -135,9 +135,9 @@ export default {
   watch: {
     file(newV) {
       if(newV != null && (newV.name.includes("-") || newV.name.includes("/"))) {
-        this.errorText = "Der Dateiname darf keins der folgenden Zeichen enthalten: -, /";
+        this.errorText = "Der Dateiname darf keines der folgenden Zeichen enthalten: -, /";
         this.file = null;
-      } else {
+      } else if(newV != null) {
         this.errorText = "";
       }
     }
