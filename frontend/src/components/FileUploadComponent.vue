@@ -50,6 +50,11 @@ export default {
     };
   },
   props: {
+    /**
+     * If this component should be used to replace a file on the server
+     * the replaceId needs to be set to the id of the soon to be replaced
+     * file on the server.
+     */
     replaceId: {
       type: String,
       default: "",
@@ -57,6 +62,11 @@ export default {
     }
   },
   methods: {
+    /**
+     * If the replaceId prop is set, this component is used to
+     * post a file to the replace-endpoint. If not a normal post
+     * request will be issued.
+     */
     uploadOrReplaceFile() {
       if(this.replaceId === "") {
         this.uploadFile();
@@ -64,6 +74,9 @@ export default {
         this.replaceFile();
       }
     },
+    /**
+     * Upload a file to the directory on the server.
+     */
     uploadFile() {
       return new Promise((resolve, reject) => {
         let formData = new FormData();
@@ -90,6 +103,10 @@ export default {
           });
       });
     },
+    /**
+     * Replace a file on the server by providing the id of the soon to be
+     * replaced file.
+     */
     replaceFile() {
       console.log("replacing file")
       return new Promise((resolve, reject) => {
@@ -133,6 +150,11 @@ export default {
     },
   },
   watch: {
+    /**
+     * Everytime a file is put into to upload it will be checked for forbidden
+     * characters in the name. "-" is forbidden because it is used as a delimiter
+     * on the servers directory.
+     */
     file(newV) {
       if(newV != null && (newV.name.includes("-") || newV.name.includes("/"))) {
         this.errorText = "Der Dateiname darf keines der folgenden Zeichen enthalten: -, /";
@@ -145,5 +167,4 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style lang="scss" scoped></style>
