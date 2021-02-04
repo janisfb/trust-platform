@@ -6,7 +6,8 @@ services:
   routes:
   - name: data_management
     paths:
-    - /api/
+    - /api/files
+    - /api/login
     strip_path: false
     methods: [ "GET", "POST", "DELETE" ]
   # - name: hello-world-tag
@@ -24,6 +25,15 @@ services:
   #   methods: [ "GET" ]
   #   strip_path: false
 
+- name: service_management
+  url: http://host.docker.internal:6001
+  routes:
+  - name: service_management
+    paths:
+    - /api/services
+    strip_path: false
+    methods: [ "GET", "POST", "DELETE" ]
+
 plugins:
 - name: basic-auth
   config: 
@@ -31,7 +41,7 @@ plugins:
     anonymous: 81823632-10c0-4098-a4f7-31062520c1e6
     # cookie_secure is true by default, and should always be true,
     # but is set to false for the sake of this demo in order to avoid using HTTPS.
-- name: session
+- name: session #this configuration should not be used in prod!
   config:
     # storage: kong
     cookie_secure: false 
@@ -41,7 +51,7 @@ plugins:
   config:
     status_code: 403
     message: 'Forbidden for anonymous users.'
-- name: cors
+- name: cors #this configuration should not be used in prod!
   enabled: true
   config: 
     origins: 

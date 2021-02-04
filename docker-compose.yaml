@@ -11,6 +11,21 @@ services:
     ports:
       - 6000:6000
 
+  service_management:
+    build:
+      context: ./backend/service_management/
+      target: debug #debug mode with nodemon running!
+    volumes:
+      - ./backend/service_management/src/:/work/src/
+      - ./files/:/work/files/
+    ports:
+      - 6001:6001
+
+  service_db:
+    image: mongo
+    ports:
+      - 27018:27017  
+
   # frontend:
   #   build:
   #     context: ./frontend/
