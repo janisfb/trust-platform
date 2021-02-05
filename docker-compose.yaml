@@ -18,13 +18,17 @@ services:
     volumes:
       - ./backend/service_management/src/:/work/src/
       - ./files/:/work/files/
+      - ./microservices/:/work/services/
     ports:
       - 6001:6001
 
   service_db:
-    image: mongo
+    image: mongo:latest
+    restart: always
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     ports:
-      - 27018:27017  
+      - 27017:27017  
 
   # frontend:
   #   build:

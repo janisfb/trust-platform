@@ -66,7 +66,7 @@ module.exports = {
 
       accessReason: Joi.string()
         .min(10)
-        .max(150)
+        .max(280)
         .required()
         .error(
           new Error(
@@ -92,7 +92,7 @@ module.exports = {
 
       externalServiceReason: Joi.string()
         .min(10)
-        .max(150)
+        .max(280)
         .required()
         .error(
           new Error(

@@ -2,10 +2,17 @@ const express = require("express");
 const mongoose = require("mongoose");
 const config = require("./config/config");
 const bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
 
 const router = require("./routes/createRouter")();
 
 const app = express();
+
+app.use(
+  fileUpload({
+    limits: { fileSize: config.FILE_SIZE },
+  })
+);
 
 mongoose
   .connect(config.DB_LINK, {

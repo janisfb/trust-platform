@@ -133,7 +133,7 @@
                 >
                   Benötigt Vollzugriff auf die Daten
                 </b-switch>
-                <ValidationProvider v-if="sovereignty.needsFullAccess" rules="required|min:10|max:150" name="accessReason" v-slot="{ errors, valid }">
+                <ValidationProvider v-if="sovereignty.needsFullAccess" rules="required|min:10|max:280" name="accessReason" v-slot="{ errors, valid }">
                   <b-field
                     :type="{ 'is-danger': errors[0], 'is-success': valid }"
                     :message="errors"
@@ -142,7 +142,7 @@
                       class="pt-2" 
                       v-model="sovereignty.accessReason"
                       placeholder="Grund für den vollständigen Zugriff" 
-                      max="150"
+                      max="280"
                     ></b-input>
                   </b-field>
                 </ValidationProvider>
@@ -168,7 +168,7 @@
                     ></b-input>
                   </b-field>
                 </ValidationProvider>
-                <ValidationProvider v-if="sovereignty.usesExternalService" rules="required|min:10|max:150" name="reason" v-slot="{ errors, valid }">
+                <ValidationProvider v-if="sovereignty.usesExternalService" rules="required|min:10|max:280" name="reason" v-slot="{ errors, valid }">
                   <b-field
                     class="pt-2" 
                     :type="{ 'is-danger': errors[0], 'is-success': valid }"
@@ -178,7 +178,7 @@
                       v-if="sovereignty.usesExternalService"
                       v-model="sovereignty.externalService.reason"
                       placeholder="Grund für die Nutzung"  
-                      max="150"
+                      max="280"
                     ></b-input>
                   </b-field>
                 </ValidationProvider>
