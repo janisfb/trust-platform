@@ -19,8 +19,8 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
   const service = require(servicePath);
 
   try {
-    const serviceCallback = (result) => {
-      resCallback(200, result);
+    const serviceCallback = (status, result) => {
+      resCallback(status, result);
     };
     service.execute(file, serviceCallback);
   } catch (err) {
