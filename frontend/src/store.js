@@ -8,9 +8,11 @@ export default new Vuex.Store({
   state: {
     status: "",
     fileStatus: "",
+    serviceStatus: "",
     token: localStorage.getItem("token") || "",
     username: localStorage.getItem("username") || "",
     files: [],
+    services: [],
     // isAdmin: localStorage.getItem("username") != null ? localStorage.getItem("username") === "admin" : false,
   },
 
@@ -74,6 +76,31 @@ export default new Vuex.Store({
       console.log(files);
       state.files = files;
       state.fileStatus = "success";
+    },
+
+    /**
+     * Sets the status of service requests to the pending state.
+     * @param {*} state
+     */
+    service_request(state) {
+      state.serviceStatus = "loading";
+    },
+    /**
+     * Sets the status of service requests to the error state.
+     * @param {*} state
+     */
+    service_error(state) {
+      state.serviceStatus = "error";
+    },
+    /**
+     * Sets the status of service requests to the success state.
+     * @param {*} state
+     * @param {any[]} param1 List containing the service obj.
+     */
+    service_success(state, services) {
+      console.log(services);
+      state.services = services;
+      state.serviceStatus = "success";
     },
   },
 
@@ -199,6 +226,33 @@ export default new Vuex.Store({
           });
       });
     },
+
+    /**
+     * Gets the services from the service_management service
+     *
+     * @param {*} param0
+     * @returns A list containing the service information.
+     */
+    getServices({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit("service_request");
+        axios({
+          url: "/api/services",
+          method: "get",
+          responseType: "json",
+          withCredentials: true,
+        })
+          .then((resp) => {
+            console.log(resp);
+            commit("service_success", resp.data);
+          })
+          .catch((err) => {
+            console.log("Something went wrong while fetching the files!");
+            commit("service_error");
+            reject(err);
+          });
+      });
+    },
   },
 
   getters: {
@@ -227,5 +281,12 @@ export default new Vuex.Store({
      * @returns A list containing the files.
      */
     getFiles: (state) => state.files,
+
+    /**
+     * Retrieves the services.
+     * @param {*} state
+     * @returns A list containing the services.
+     */
+    getServices: (state) => state.services,
   },
 });

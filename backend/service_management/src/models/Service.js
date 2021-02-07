@@ -14,6 +14,10 @@ const ServiceSchema = new Schema({
     type: String,
     required: true,
   },
+  tel: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,

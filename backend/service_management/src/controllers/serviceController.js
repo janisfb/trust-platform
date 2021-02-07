@@ -18,17 +18,18 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
   }
 
   const newService = new Service({
-    company: reqBody.company,
-    url: reqBody.url,
-    email: reqBody.email,
-    name: reqBody.name,
-    version: reqBody.version,
-    description: reqBody.description,
-    needsFullAccess: reqBody.needsFullAccess,
-    accessReason: reqBody.accessReason,
-    usesExternalService: reqBody.usesExternalService,
-    externalServiceName: reqBody.externalServiceName,
-    externalServiceReason: reqBody.externalServiceReason,
+    company: reqBody.contact.company,
+    url: reqBody.contact.url,
+    email: reqBody.contact.email,
+    tel: reqBody.contact.tel,
+    name: reqBody.serviceMeta.name,
+    version: reqBody.serviceMeta.version,
+    description: reqBody.serviceMeta.description,
+    needsFullAccess: reqBody.sovereignty.needsFullAccess,
+    accessReason: reqBody.sovereignty.accessReason,
+    usesExternalService: reqBody.sovereignty.usesExternalService,
+    externalServiceName: reqBody.sovereignty.externalServiceName,
+    externalServiceReason: reqBody.sovereignty.externalServiceReason,
   });
 
   newService
@@ -41,7 +42,6 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
         config.SERVICE_UPLOAD_DIRECTORY,
         `${newService._id}_${uploadFile.name}`
         );
-      console.log("got here", fileUploadPath);
 
       // the created temp file will be moved to the users directory
       uploadFile.mv(fileUploadPath, function (err) {
@@ -59,7 +59,7 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
         }
 
         console.log(`Service uploaded to ${fileUploadPath}!`);
-        resCallback(200, `Service uploaded to ${fileUploadPath}!`);
+        resCallback(200, `Service uploaded!`);
       });
     })
     .catch((err) => {
@@ -69,9 +69,9 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
       );
       Service.deleteOne({ _id: newService._id }, function(err, result) {
         if(err) {
-          console.log("could not delete entry:", err)
+          console.log("could not delete entry:", err);
         } else {
-          console.log("deleted entry:", result)
+          console.log("deleted entry:", result);
         }
       });
       resCallback(500, err);
@@ -85,9 +85,38 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
  */
 exports.getServices = function (resCallback) {
   Service.find()
-    .then((services) => resCallback(200, services))
+    .then((services) => {
+      var response = [];
+
+      //get information about all available files
+      for (let service of services) {
+        response.push({
+          contact: {
+            company: service.company,
+            url: service.url,
+            email: service.email,
+            tel: service.tel,
+          },
+          serviceMeta: {
+            name: service.name,
+            version: service.version,
+            description: service.description,
+          },
+          sovereignty: {
+            needsFullAccess: service.needsFullAccess,
+            accessReason: service.accessReason,
+            usesExternalService: service.usesExternalService,
+            externalService: {
+              name: service.externalServiceName,
+              reason: service.externalServiceReason,
+            }
+          }
+        });
+      }
+      resCallback(200, response);
+    })
     .catch((err) => {
       console.log(err);
-      resCallback(404, "No services found!")
+      resCallback(404, "No services found!");
     });
 };

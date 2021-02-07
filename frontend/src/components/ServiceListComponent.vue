@@ -14,7 +14,11 @@
         >Neuen Service hinzufügen</b-button
       >
     </div>
-    <h1 class="pt-5" v-if="data.length == 0">Keine Services verfügbar!</h1>
+    <div v-if="this.fetchError != ''">
+      <h1 class="has-text-danger">{{ fetchError }}</h1>
+      <b-button @click="retryServiceFetch">Services erneut laden</b-button>
+    </div>
+    <h1 class="pt-5" v-else-if="services.length == 0">Keine Services verfügbar!</h1>
     <div v-else class="container">
       <b-table
         hoverable
@@ -78,7 +82,6 @@
 </template>
 
 <script>
-const data = require("@/data/service.json");
 import ServiceInfoComponent from "@/components/ServiceInfoComponent";
 import ServiceCreatorComponent from "./ServiceCreatorComponent.vue";
 
@@ -86,8 +89,7 @@ export default {
   name: "ServiceExplorer",
   data() {
     return {
-      // table data + settings
-      data,
+      // settings
       paginationPosition: "bottom",
       currentPage: 1,
       perPage: 8,
@@ -97,6 +99,8 @@ export default {
       isInfoModalActive: false,
       modalInformation: {},
       searchQuery: "",
+
+      fetchError: "",
     };
   },
   components: {
@@ -134,6 +138,14 @@ export default {
       }
     },
     /**
+     * Gets the data (in this case the services) from the vuex store.
+     * 
+     * @returns {any[]} A list containing all fetched data.
+     */
+    services() {
+      return this.$store.getters.getServices;
+    },
+    /**
      * Filters the data with the searchQuery.
      * Searchable: name, creator and version
      *
@@ -141,17 +153,17 @@ export default {
      */
     filter() {
       var name_re = new RegExp(this.searchQuery, "i");
-      var dataFiltered = [];
-      for (var i in this.data) {
+      var servicesFiltered = [];
+      for (var i in this.services) {
         if (
-          this.data[i].serviceMeta.name.match(name_re) ||
-          this.data[i].contact.company.match(name_re) ||
-          this.data[i].serviceMeta.version.match(name_re)
+          this.services[i].serviceMeta.name.match(name_re) ||
+          this.services[i].contact.company.match(name_re) ||
+          this.services[i].serviceMeta.version.match(name_re)
         ) {
-          dataFiltered.push(this.data[i]);
+          servicesFiltered.push(this.services[i]);
         }
       }
-      return dataFiltered;
+      return servicesFiltered;
     },
   },
   methods: {
@@ -168,6 +180,27 @@ export default {
     launchServiceCreatorModal() {
       this.isCreatorModalActive = true;
     },
+    /**
+     * Tries to refetch the services.
+     */
+    retryServiceFetch() {
+      this.$store
+        .dispatch("getServices")
+        .catch((error) => {
+          this.fetchError = "Die Services konnten nicht geladen werden!";
+          console.log(error);
+        });
+      this.fetchError = "";
+    },
+  },
+  created() {
+    // if(this.$store.getters.getFiles == [])
+    this.$store
+      .dispatch("getServices")
+      .catch((error) => {
+        this.fetchError = "Die Services konnten nicht geladen werden!";
+        console.log(error);
+      });
   },
 };
 </script>

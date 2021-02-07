@@ -15,11 +15,11 @@ db.services.save({
   name: "OpenWeather Dortmund",
   version: "1.0.0",
   description:
-    "Dieser Dienst gibt das aktuelle Wetter am Standort Dortmund zurück.",
-  needsFullAccess: false,
-  accessReason: "Not Applicable",
+    "Dieser Dienst gibt das aktuelle Wetter am Standort, der in der Datei def. ist, zurück.",
+  needsFullAccess: true,
+  accessReason: "Die Angabe zum Ort wird aus der Datei gelesen.",
   usesExternalService: true,
-  externalServiceName: "Open Weather Map, rapidapi",
+  externalServiceName: "Open Weather Map",
   externalServiceReason:
     "Die Wetterdaten werden extern von OpenWeather gesammelt und von diesem Service nur abgefragt.",
 });

@@ -24,7 +24,6 @@
         :per-page="this.computePageSize"
         :current-page.sync="currentPage"
         @details-open="(row, index) => closeOtherDetail(row)"
-        @dblclick="(row, index) => closeOtherDetail(row)"
       >
         <b-table-column field="fileName" label="Datei" sortable v-slot="props">
           <div style="max-width: 270px; overflow: hidden; text-overflow: ellipsis;">
@@ -72,14 +71,33 @@
           {{ transformSizeFormat(props.row.fileSizeInBytes) }}
         </b-table-column>
 
-        <b-table-column field="" centered>
-          <b-tooltip
-            multilined
-            type="is-light"
-            label="Einen Service auf dieser Datei ausführen"
-          >
-            <b-icon class="zoom" icon="play-circle-outline"></b-icon>
-          </b-tooltip>
+        <b-table-column field="" v-slot="props" centered>
+          <div v-on:click="launchExecuteModal()">
+            <b-tooltip
+              multilined
+              type="is-light"
+              label="Einen Service auf dieser Datei ausführen"
+            >
+              <b-icon v-on:click="launchExecuteModal()" class="zoom" icon="play-circle-outline"></b-icon>
+            </b-tooltip>
+          </div>
+
+          <b-modal v-model="isExecuteModalActive" full-screen>
+            <div class="box" style="padding: 0px; min-height: 90vh;">
+              <section class="hero is-light">
+                <div class="hero-body">
+                  <h1 class="title">Service ausführen</h1>
+                  <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                </div>
+              </section>
+              <section style="padding: 3.5rem">
+                <service-list-component></service-list-component>
+              </section>
+              <section>
+                <b-button @click="closeExecuteModal()">Abbrechen</b-button>
+              </section>
+            </div>
+          </b-modal> 
         </b-table-column>
 
         <template #detail="props">
@@ -115,22 +133,21 @@
               >
             </div>
           </div>
-
           <b-modal v-model="isReplaceModalActive" :width="400">
-            <div class="box" style="padding: 0px">
-              <section class="hero is-light">
-                <div class="hero-body">
-                  <h1 class="title">Datei ersetzen</h1>
-                  <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
-                </div>
-              </section>
-              <section style="padding: 1.5rem">
-                <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
-                <file-upload-component :replaceId="props.row.id"></file-upload-component>
-              </section>
-            </div>
-          </b-modal>
-        </template>       
+              <div class="box" style="padding: 0px">
+                <section class="hero is-light">
+                  <div class="hero-body">
+                    <h1 class="title">Datei ersetzen</h1>
+                    <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                  </div>
+                </section>
+                <section style="padding: 1.5rem; padding-left: 3em;">
+                  <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
+                  <file-upload-component :replaceId="props.row.id"></file-upload-component>
+                </section>
+              </div>
+            </b-modal>
+        </template>  
       </b-table>
     </div>
   </section>
@@ -139,9 +156,10 @@
 <script>
 import axios from "axios";
 import FileUploadComponent from './FileUploadComponent.vue';
+import ServiceListComponent from './ServiceListComponent.vue';
 
 export default {
-  components: { FileUploadComponent },
+  components: { FileUploadComponent, ServiceListComponent },
   name: "FileExplorer",
   data() {
     return {
@@ -153,6 +171,7 @@ export default {
       showDetailIcon: true,
       defaultOpenedDetails: [],
       isReplaceModalActive: false,
+      isExecuteModalActive: false,
       // searchQuery for filter
       searchQuery: "",
       fetchError: "",
@@ -269,6 +288,18 @@ export default {
       this.isReplaceModalActive = true;
     },
     /**
+     * Launches the service execution modal.
+     */
+    launchExecuteModal() {
+      this.isExecuteModalActive = true;
+    },
+    /**
+     * Closes the service execution modal.
+     */
+    closeExecuteModal() {
+      this.isExecuteModalActive = false;
+    },
+    /**
      * Tries to refetch the files.
      */
     retryFileFetch() {
@@ -363,12 +394,12 @@ export default {
   },
   created() {
     // if(this.$store.getters.getFiles == [])
-      this.$store
-        .dispatch("getFiles")
-        .catch((error) => {
-          this.fetchError = "Die Dateien konnten nicht geladen werden!";
-          console.log(error);
-        });
+    this.$store
+      .dispatch("getFiles")
+      .catch((error) => {
+        this.fetchError = "Die Dateien konnten nicht geladen werden!";
+        console.log(error);
+      });
   },
 };
 </script>
