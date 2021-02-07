@@ -71,14 +71,18 @@
           {{ transformSizeFormat(props.row.fileSizeInBytes) }}
         </b-table-column>
 
-        <b-table-column field="" v-slot="props" centered>
-          <div v-on:click="launchExecuteModal()">
+        <b-table-column 
+          field="" 
+          v-slot="props" 
+          centered
+        >
+          <div v-on:click="launchExecuteModal(props.row)">
             <b-tooltip
               multilined
               type="is-light"
               label="Einen Service auf dieser Datei ausführen"
             >
-              <b-icon v-on:click="launchExecuteModal()" class="zoom" icon="play-circle-outline"></b-icon>
+              <b-icon class="zoom" icon="play-circle-outline"></b-icon>
             </b-tooltip>
           </div>
 
@@ -87,17 +91,28 @@
               <section class="hero is-light">
                 <div class="hero-body">
                   <h1 class="title">Service ausführen</h1>
-                  <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                  <h2 class="subtitle">{{ executionFileName }} [{{executionFileId}}]</h2>
                 </div>
               </section>
               <section style="padding: 3.5rem">
-                <service-list-component></service-list-component>
+                <service-list-component :selectable="true" @selected="onServiceSelected"></service-list-component>
+                <hr/>
+                <div v-if="selectedService != null">
+                  <h1>Ausgewählt: {{ selectedService.serviceMeta.name }}</h1>
+                  <b-button 
+                    class="mt-2 is-primary" 
+                    @click="confirmExecute(selectedService.id, executionFileId)"
+                  >
+                    Service ausführen
+                  </b-button>
+                </div>
+                <hr/>
               </section>
               <section>
                 <b-button @click="closeExecuteModal()">Abbrechen</b-button>
               </section>
             </div>
-          </b-modal> 
+          </b-modal>
         </b-table-column>
 
         <template #detail="props">
@@ -149,6 +164,18 @@
             </b-modal>
         </template>  
       </b-table>
+      <b-modal v-model="isResultModalActive" :width="800">
+        <div class="box" style="padding: 0px">
+          <section class="hero is-light">
+            <div class="hero-body">
+              <h1 class="title">Ergebnis</h1>
+            </div>
+          </section>
+          <section v-if="executionResult != null" style="padding: 1.5rem; padding-left: 3em;">
+            <p>{{ executionResult.data.result }}</p>
+          </section>
+        </div>
+      </b-modal>
     </div>
   </section>
 </template>
@@ -164,7 +191,6 @@ export default {
   data() {
     return {
       // data + config for the table
-      data: [],
       isPaginated: true,
       currentPage: 1,
       perPage: 8,
@@ -172,9 +198,15 @@ export default {
       defaultOpenedDetails: [],
       isReplaceModalActive: false,
       isExecuteModalActive: false,
+      isResultModalActive: false,
       // searchQuery for filter
       searchQuery: "",
       fetchError: "",
+
+      selectedService: null,
+      executionResult: null,
+      executionFileName: "",
+      executionFileId: "",
     };
   },
   props: {
@@ -290,8 +322,21 @@ export default {
     /**
      * Launches the service execution modal.
      */
-    launchExecuteModal() {
+    launchExecuteModal(row) {
+      console.log("ex", row);
+      this.executionFileName = row.fileName;
+      this.executionFileId = row.id;
       this.isExecuteModalActive = true;
+    },
+    /**
+     * Launches the result modal after service execution.
+     * 
+     * @param {*} result - The result of the execution. 
+     */
+    launchResultModal(result) {
+      this.closeExecuteModal();
+      this.executionResult = result;
+      this.isResultModalActive = true;
     },
     /**
      * Closes the service execution modal.
@@ -364,6 +409,46 @@ export default {
       });
     },
     /**
+     * Prompts for a confirm before executing the service.
+     * 
+     * @param {String} serviceId - The id of the service that should be executed.
+     * @param {String} fileId - The id of the file that the service should be executed with.
+     */
+    confirmExecute(serviceId, fileId) {
+      this.$buefy.dialog.confirm({
+        title: "Service ausführen",
+        message: `Bei dem Ausführen dieses Services könnte sich der Schutzgrad der Daten verändern.
+        Vor der Ausführung sollten in der Übersicht die Nutzungsbedingungen genau überprüft werden. Trotzdem fortfahren?`,
+        cancelText: "Abbrechen",
+        confirmText: "Service ausführen",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => this.executeService(serviceId, fileId)
+      })
+    },
+    /**
+     * Performs the execution of the service.
+     * 
+     * @param {String} serviceId - The id of the service that should be executed.
+     * @param {String} fileId - The id of the file that the service should be executed with.
+     */
+    executeService(serviceId, fileId) {
+      this.executionResult = null;
+      return new Promise((resolve, reject) => {
+        axios.get(`/api/services/${serviceId}/${fileId}`)
+          .then((resp) => {
+            console.log(resp);            
+            this.launchResultModal(resp);
+            resolve();
+          })
+          .catch((err) => {
+            console.log("Something went wrong while executing a service.");
+            this.openFailedToast("Der Service konnte nicht ausgeführt werden!");
+            reject(err);
+          });
+      });
+    },
+    /**
      * Opens error toast.
      * 
      * @param {string} message The message that should be shown.
@@ -390,6 +475,14 @@ export default {
         type: "is-success",
         queue: false,
       });
+    },
+    /**
+     * Gets called when a service has been selected in the modal containing the ServiceInfoComponent.
+     * 
+     * @param {*} selectedService - The service that has been selected.
+     */
+    onServiceSelected(selectedService) {
+      this.selectedService = selectedService;
     },
   },
   created() {
@@ -420,5 +513,9 @@ export default {
 
 .text-align-left {
   text-align: left;
+}
+
+.level.is-flex-mobile {
+  justify-content: center;
 }
 </style>

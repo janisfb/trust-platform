@@ -91,6 +91,7 @@ exports.getServices = function (resCallback) {
       //get information about all available files
       for (let service of services) {
         response.push({
+          id: service._id,
           contact: {
             company: service.company,
             url: service.url,

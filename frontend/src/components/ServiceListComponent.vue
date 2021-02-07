@@ -18,7 +18,7 @@
       <h1 class="has-text-danger">{{ fetchError }}</h1>
       <b-button @click="retryServiceFetch">Services erneut laden</b-button>
     </div>
-    <h1 class="pt-5" v-else-if="services.length == 0">Keine Services verfügbar!</h1>
+    <h1 class="pt-5" v-else-if="services.length == 0">Keine Services verfügbar!</h1>   
     <div v-else class="container">
       <b-table
         hoverable
@@ -29,9 +29,10 @@
         :data="filter"
         :paginated="true"
         :per-page="this.computePageSize"
+        v-bind:selected.sync="selected"
         :current-page.sync="currentPage"
         :pagination-position="paginationPosition"
-        @click="(row) => launchServiceInfoModal(row)"
+        @click="(row) => {if(!this.selectable) launchServiceInfoModal(row);}"
       >
         <b-table-column
           field="serviceMeta.name"
@@ -68,16 +69,15 @@
           </div>
         </b-table-column>
 
-        <b-modal v-model="isInfoModalActive" :width="600">
-          <service-info-component v-bind:service-element="modalInformation">
-          </service-info-component>
-        </b-modal>
-
         <b-modal v-model="isCreatorModalActive" :width="600">
           <service-creator-component></service-creator-component>
         </b-modal>
       </b-table>
     </div>
+    <b-modal v-model="isInfoModalActive" :width="600">
+      <service-info-component v-bind:service-element="modalInformation">
+      </service-info-component>
+    </b-modal>
   </section>
 </template>
 
@@ -101,11 +101,34 @@ export default {
       searchQuery: "",
 
       fetchError: "",
+
+      selected: null,
     };
   },
   components: {
     ServiceInfoComponent,
     ServiceCreatorComponent,
+  },
+  props: {
+    /**
+     * Enforces different behaviour when table should be selectable:
+     *  Info will not open on row-click.
+     */
+    selectable: {
+      type: Boolean,
+      required: true,
+    }
+  },
+  watch: {
+    /**
+     * Emits the selected value to the parent 
+     * - in this case the execution modal in FileListComponent.
+     */
+    selected(newValue) {
+      if(newValue != null) {
+        this.$emit("selected", newValue);
+      }
+    }
   },
   computed: {
     /**
@@ -193,6 +216,9 @@ export default {
       this.fetchError = "";
     },
   },
+  /**
+   * When the service is created the services have to get loaded.
+   */
   created() {
     // if(this.$store.getters.getFiles == [])
     this.$store

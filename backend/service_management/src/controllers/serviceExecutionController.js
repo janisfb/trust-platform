@@ -11,6 +11,12 @@ const config = require("../config/config");
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
 exports.executeService = function (reqServiceId, reqFileId, resCallback) {
+  if (reqServiceId == "undefined" || reqFileId == "undefined") {
+    console.log(`Wrong params. ${reqServiceId}, ${reqFileId}`);
+    resCallback(400, "Wrong params.");
+    return;
+  }
+
   console.log("Starting service", reqServiceId, reqFileId);
 
   const servicePath = getService(reqServiceId, resCallback);

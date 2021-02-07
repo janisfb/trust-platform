@@ -4,7 +4,7 @@
       <div class="columns">
         <div class="column">
           <div class="box fill-height">
-            <service-list-component></service-list-component>
+            <service-list-component :selectable="false"></service-list-component>
           </div>
         </div>
       </div>
