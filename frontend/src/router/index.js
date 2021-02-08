@@ -6,6 +6,7 @@ import Stage from "../views/Stage.vue"
 import ServicesView from "../views/ServicesView.vue";
 import LogsView from "../views/LogsView.vue";
 import Login from "../views/LoginView.vue"
+import config from "../config/config"
 
 Vue.use(VueRouter)
 
@@ -57,9 +58,10 @@ const router = new VueRouter({
  * -> Re-Route to /login if no user is currently logged in.
  */
 router.beforeEach((to, from, next) => {
-  console.log("checking route:", to.path);
+  if (config.CONSOLE_LOGGING) console.log("checking route:", to.path);
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    console.log("Login required! Logged in?", store.getters.isLoggedIn);
+    if (config.CONSOLE_LOGGING)
+      console.log("Login required! Logged in?", store.getters.isLoggedIn);
     if (store.getters.isLoggedIn) {
       next();
       return;

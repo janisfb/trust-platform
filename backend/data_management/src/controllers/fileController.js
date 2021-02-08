@@ -38,8 +38,9 @@ exports.uploadFile = function (reqFiles, reqUsername, resCallback) {
       return;
     }
 
-    console.log(`File uploaded to ${fileUploadPath}!`);
-    resCallback(200, `File uploaded to ${fileUploadPath}!`);
+    if (config.CONSOLE_LOGGING)
+      console.log(`File uploaded to ${fileUploadPath}!`);
+    resCallback(200, "File uploaded!");
   });
 };
 
@@ -60,7 +61,7 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
   let fileUploadPath;
   var files = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`);
 
-  console.log("file can be replaced", files)
+  if (config.CONSOLE_LOGGING) console.log("file can be replaced", files);
 
   if (files.length > 0) {
     fileUploadPath = files[0];
@@ -83,7 +84,8 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
       return;
     }
 
-    console.log(`File at ${fileUploadPath} updated!`);
+    if (config.CONSOLE_LOGGING)
+      console.log(`File at ${fileUploadPath} updated!`);
     resCallback(200, `File ${reqFileId} updated!`);
   });
 };
@@ -113,7 +115,8 @@ exports.deleteFile = function (reqFileId, resCallback) {
 
   try {
     fs.unlinkSync(fileUploadPath);
-    console.log(`File at ${fileUploadPath} deleted!`);
+    if (config.CONSOLE_LOGGING)
+      console.log(`File at ${fileUploadPath} deleted!`);
     resCallback(200, `File ${reqFileId} was deleted!`);
     return;
   } catch (error) {
@@ -130,7 +133,7 @@ exports.deleteFile = function (reqFileId, resCallback) {
 exports.getUserFiles = function (reqUsername, resCallback) {
   const files = fs.readdirSync(config.UPLOAD_DIRECTORY);
 
-  console.log(`got ${files.length} files`);
+  if (config.CONSOLE_LOGGING) console.log(`got ${files.length} files`);
 
   var response = [];
 
@@ -141,7 +144,7 @@ exports.getUserFiles = function (reqUsername, resCallback) {
     }
   }
 
-  console.log(response);
+  if (config.CONSOLE_LOGGING) console.log(response);
   resCallback(200, response);
 };
 

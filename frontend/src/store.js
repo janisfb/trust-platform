@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import config from "./config/config"
 
 Vue.use(Vuex);
 
@@ -73,7 +74,6 @@ export default new Vuex.Store({
      * @param {any[]} param1 List containing the file obj.
      */
     file_success(state, files) {
-      console.log(files);
       state.files = files;
       state.fileStatus = "success";
     },
@@ -98,7 +98,6 @@ export default new Vuex.Store({
      * @param {any[]} param1 List containing the service obj.
      */
     service_success(state, services) {
-      console.log(services);
       state.services = services;
       state.serviceStatus = "success";
     },
@@ -128,13 +127,14 @@ export default new Vuex.Store({
           .then((resp) => {
             const token = resp.data["token"];
             const user = resp.data["username"];
-            console.log("user logged in:", user, " // ", token);
+            if (config.CONSOLE_LOGGING)
+              console.log("user logged in:", user, " // ", token);
 
             localStorage.setItem("token", token);
             localStorage.setItem("username", user);
 
             axios.defaults.headers.common["Authorization"] = token;
-            console.log("one step", user);
+            
             commit("auth_success", {
               token: token,
               username: user,
@@ -154,13 +154,14 @@ export default new Vuex.Store({
               .then((resp) => {
                 const token = resp.data["token"];
                 const user = resp.data["username"];
-                console.log("user logged in:", user, " // ", token);
+                if (config.CONSOLE_LOGGING)
+                  console.log("user logged in:", user, " // ", token);
 
                 localStorage.setItem("token", token);
                 localStorage.setItem("username", user);
 
                 axios.defaults.headers.common["Authorization"] = token;
-                console.log("one step", user);
+                
                 commit("auth_success", {
                   token: token,
                   username: user,
@@ -168,12 +169,13 @@ export default new Vuex.Store({
                 resolve(resp);
               })
               .catch((err2) => {
-                console.log(
-                  "something went wrong",
-                  err2.message,
-                  "\n first error:",
-                  err1.message
-                );
+                if (config.CONSOLE_LOGGING)
+                  console.log(
+                    "something went wrong",
+                    err2.message,
+                    "\n first error:",
+                    err1.message
+                  );
                 commit("auth_error");
                 localStorage.removeItem("token");
                 reject(err2);
@@ -191,7 +193,7 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         commit("logout");
         axios.post("/api/login?session_logout").catch((err) => {
-          console.log("Logout failed!", err);
+          if(config.CONSOLE_LOGGING) console.log("Logout failed!", err);
         });
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -216,11 +218,11 @@ export default new Vuex.Store({
           withCredentials: true,
         })
           .then((resp) => {
-            console.log(resp);
+            if(config.CONSOLE_LOGGING) console.log(resp);
             commit("file_success", resp.data);
           })
           .catch((err) => {
-            console.log("Something went wrong while fetching the files!");
+            if (config.CONSOLE_LOGGING) console.log("Something went wrong while fetching the files!");
             commit("file_error");
             reject(err);
           });
@@ -243,11 +245,12 @@ export default new Vuex.Store({
           withCredentials: true,
         })
           .then((resp) => {
-            console.log(resp);
+            // console.log(resp);
             commit("service_success", resp.data);
           })
           .catch((err) => {
-            console.log("Something went wrong while fetching the files!");
+            if (config.CONSOLE_LOGGING)
+              console.log("Something went wrong while fetching the files!");
             commit("service_error");
             reject(err);
           });

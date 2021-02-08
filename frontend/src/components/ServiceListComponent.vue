@@ -100,8 +100,10 @@ export default {
       modalInformation: {},
       searchQuery: "",
 
+      // fetchError text when fetch of services failed
       fetchError: "",
 
+      // selected.sync var of table
       selected: null,
     };
   },

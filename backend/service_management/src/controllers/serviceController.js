@@ -9,8 +9,6 @@ const config = require("../config/config");
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
 exports.createService = function (reqBody, reqFiles, resCallback) {
-  console.log(reqBody)
-  console.log("i")
   if (!reqFiles || Object.keys(reqFiles).length === 0) {
     console.log("No files were uploaded / added to the request.");
     resCallback(400, "No files were uploaded.");
@@ -58,7 +56,8 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
           return;
         }
 
-        console.log(`Service uploaded to ${fileUploadPath}!`);
+        if (config.CONSOLE_LOGGING)
+          console.log(`Service uploaded to ${fileUploadPath}!`);
         resCallback(200, `Service uploaded!`);
       });
     })

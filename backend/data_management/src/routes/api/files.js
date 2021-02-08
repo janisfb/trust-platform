@@ -1,6 +1,7 @@
 const Router = require("express").Router;
 const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
 const fileController = require("../../controllers/fileController");
+const config = require("../../config/config");
 
 /**
  * routes for file manipulation operations

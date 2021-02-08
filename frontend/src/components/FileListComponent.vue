@@ -199,12 +199,18 @@ export default {
       isReplaceModalActive: false,
       isExecuteModalActive: false,
       isResultModalActive: false,
+
       // searchQuery for filter
       searchQuery: "",
+
+      // fetchError to show when file fetch failed
       fetchError: "",
 
+      // selectedService from execute modal - gets emitted by ServiceListComponent
       selectedService: null,
+      // executionResult of service execution
       executionResult: null,
+      // workaround for buefy bug with props-var - data has to be safed upon opening of execute modal
       executionFileName: "",
       executionFileId: "",
     };
@@ -513,9 +519,5 @@ export default {
 
 .text-align-left {
   text-align: left;
-}
-
-.level.is-flex-mobile {
-  justify-content: center;
 }
 </style>

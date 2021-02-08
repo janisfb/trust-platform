@@ -17,7 +17,8 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
     return;
   }
 
-  console.log("Starting service", reqServiceId, reqFileId);
+  if (config.CONSOLE_LOGGING)
+    console.log("Starting service", reqServiceId, reqFileId);
 
   const servicePath = getService(reqServiceId, resCallback);
   const file = getFile(reqFileId, resCallback);

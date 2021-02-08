@@ -1,5 +1,6 @@
 const Router = require("express").Router;
 const authController = require("../../controllers/authController");
+const config = require("../../config/config")
 
 /**
  * routes for auth service 
@@ -9,7 +10,7 @@ module.exports = Router({ mergeParams: true }).post(
   "/login",
   async (req, res, next) => {
     try {
-      console.log(req);
+      if (config.CONSOLE_LOGGING) console.log(req);
       const callback = (status, message) => {
         res.status(status).send(message);
       };
