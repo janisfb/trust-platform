@@ -12,7 +12,7 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      serviceCallback(error.status, { error: "File format cannot be translated" });
+      serviceCallback(error.status || 500, { error: "File format cannot be translated" });
       return;
     }
     console.log(location);
@@ -25,7 +25,7 @@ module.exports = {
     request(options, function (error, response, body) {
       if (error) {
         console.log(error);
-        serviceCallback(error.status, { error: "Something went wrong." });
+        serviceCallback(error.status || 500, { error: "Something went wrong." });
       }
 
       console.log(body);

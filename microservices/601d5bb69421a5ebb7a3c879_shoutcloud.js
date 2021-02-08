@@ -27,7 +27,7 @@ module.exports = {
     request(options, function (error, response, body) {
       if (error) {
         console.log(error);
-        serviceCallback(error.status, { error: "Something went wrong." });
+        serviceCallback(error.status || 500, { error: "Something went wrong." });
       }
 
       console.log(body);

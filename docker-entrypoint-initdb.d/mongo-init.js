@@ -60,6 +60,25 @@ db.services.save({
     "Die komplizierte Umwandlung des Textes erfolgt über die hochkomplexen Algorithmen von ShoutCloud.",
 });
 
+db.services.save({
+  _id: "601d5bb69421a5ebb7a3c880",
+  company: "Upload Company",
+  url: "example.com",
+  email: "info@example.com",
+  tel: "0123 4567890",
+  name: "Upload to Anywhere",
+  version: "1.0.0",
+  description:
+    "Dieser Dienst lädt die gesamte Datei auf file.io hoch, wo sie dann für die nächsten paar Tage abrufbar ist.",
+  needsFullAccess: true,
+  accessReason:
+    "Die Datei wird komplett hochgeladen.",
+  usesExternalService: true,
+  externalServiceName: "file.io",
+  externalServiceReason:
+    "Die Dateien werden extern auf den Servern von file.io gespeichert..",
+});
+
 print(
   "End init #################################################################"
 );
