@@ -1,18 +1,23 @@
 module.exports = {
-  execute: (file, serviceCallback) => {
+  execute: ({ filebuffer, filename }, serviceCallback) => {
     const request = require("request");
 
     var location = "";
     try {
-      location = file.toString('utf-8');
-      if(!(/^[\u00C0-\u017FA-Za-z]+,[a-z]{2}$/.test(location))) {
-          serviceCallback(400, `Request: ${location} wrong format. 
-          The file should contain a location in the format 'city,countryCode'. Example: 'Dortmund,de'`);
-          return;
+      location = filebuffer.toString("utf-8");
+      if (!/^[\u00C0-\u017FA-Za-z]+,[a-z]{2}$/.test(location)) {
+        serviceCallback(
+          400,
+          `Request: ${location} wrong format. 
+          The file should contain a location in the format 'city,countryCode'. Example: 'Dortmund,de'`
+        );
+        return;
       }
     } catch (error) {
       console.log(error);
-      serviceCallback(error.status || 500, { error: "File format cannot be translated" });
+      serviceCallback(error.status || 500, {
+        error: "File format cannot be translated",
+      });
       return;
     }
     console.log(location);
@@ -25,7 +30,9 @@ module.exports = {
     request(options, function (error, response, body) {
       if (error) {
         console.log(error);
-        serviceCallback(error.status || 500, { error: "Something went wrong." });
+        serviceCallback(error.status || 500, {
+          error: "Something went wrong.",
+        });
       }
 
       console.log(body);
@@ -34,5 +41,5 @@ module.exports = {
         result: `Die Temperatur in ${body.name} ist ${body.main.temp} (gefühlt ${body.main.feels_like}) Grad Celsius. Die momentane Wetterlage ist: ${body.weather[0].description}.`,
       });
     });
-  }
+  },
 };

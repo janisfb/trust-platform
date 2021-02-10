@@ -95,7 +95,7 @@
                 </div>
               </section>
               <section style="padding: 3.5rem">
-                <service-list-component :selectable="true" @selected="onServiceSelected"></service-list-component>
+                <service-list-component :selectable="true" :rowsperpage="4" @selected="onServiceSelected"></service-list-component>
                 <hr/>
                 <div v-if="selectedService != null">
                   <h1>Ausgewählt: {{ selectedService.serviceMeta.name }}</h1>
@@ -107,8 +107,6 @@
                   </b-button>
                 </div>
                 <hr/>
-              </section>
-              <section>
                 <b-button @click="closeExecuteModal()">Abbrechen</b-button>
               </section>
             </div>

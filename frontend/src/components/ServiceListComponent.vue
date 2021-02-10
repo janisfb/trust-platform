@@ -119,6 +119,13 @@ export default {
     selectable: {
       type: Boolean,
       required: true,
+    },
+    /**
+     * Set the number of rows for the table manually.
+     */
+    rowsperpage: {
+      type: Number,
+      required: false,
     }
   },
   watch: {
@@ -157,9 +164,9 @@ export default {
     computePageSize() {
       if (window.matchMedia("(max-width: 1200px)").matches) {
         console.log("below max-width - reducing size");
-        return 5;
+        return (this.rowsperpage/2) || 4;
       } else {
-        return 8;
+        return this.rowsperpage || 8;
       }
     },
     /**

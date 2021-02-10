@@ -1,11 +1,11 @@
 module.exports = {
-  execute: (file, serviceCallback) => {
+  execute: ({ filebuffer, filename }, serviceCallback) => {
     const request = require("request");
 
     var text = "";
     try {
-      text = file.toString("utf-8");
-    } catch (err) {
+      text = filebuffer.toString("utf-8");
+    } catch (error) {
       console.log(error);
       serviceCallback(error.status, {
         error: "File format cannot be translated",
@@ -20,18 +20,20 @@ module.exports = {
         "content-type": "application/json",
         "accept-encoding": "application/json",
       },
-      body: { "INPUT": text },
+      body: { INPUT: text },
       json: true,
     };
 
     request(options, function (error, response, body) {
       if (error) {
         console.log(error);
-        serviceCallback(error.status || 500, { error: "Something went wrong." });
+        serviceCallback(error.status || 500, {
+          error: "Something went wrong.",
+        });
       }
 
       console.log(body);
-      
+
       try {
         serviceCallback(200, {
           result: body.OUTPUT,
