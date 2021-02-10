@@ -21,7 +21,7 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
     console.log("Starting service", reqServiceId, reqFileId);
 
   const servicePath = getService(reqServiceId, resCallback);
-  const file = getFile(reqFileId, resCallback);
+  const fileObj = getFile(reqFileId, resCallback);
 
   const service = require(servicePath);
 
@@ -29,7 +29,7 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
     const serviceCallback = (status, result) => {
       resCallback(status, result);
     };
-    service.execute(file, serviceCallback);
+    service.execute(fileObj, serviceCallback);
   } catch (err) {
     console.log(
       `Something went wrong while trying to execute the service with id ${reqServiceId}`,
@@ -39,6 +39,14 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
   }
 };
 
+/**
+ * Returns the service path (if found on disc) associated to a given id.
+ * There is no access restriction on services in this prototype.
+ * 
+ * @param {*} serviceId The serviceId for which the path should be returned.
+ * @param {*} resCallback The callback for the Router containing the status and message.
+ * @returns {string} serviceUploadPath - returns the path of the service.
+ */
 const getService = (serviceId, resCallback) => {
   let serviceUploadPath;
 
@@ -57,20 +65,37 @@ const getService = (serviceId, resCallback) => {
   return serviceUploadPath;
 }
 
+/**
+ * Returns the file (if found on disc) associated to a given id.
+ * The enforcement of access restrictions has already been done by middleware 
+ * at this step. 
+ * 
+ * @param {string} fileId The id of the file that should get attached.
+ * @param {*} resCallback The callback for the Router containing the status and message.
+ * @returns {*} An obj containing the file buffer and the filename.
+ */
 const getFile = (fileId, resCallback) => {
   let fileUploadPath;
 
   var files = glob.sync(`${config.FILE_UPLOAD_DIRECTORY}/*-${fileId}-*`);
+  fileUploadPath = files[0];
 
-  if (files.length > 0) {
-    fileUploadPath = files[0];
-  }
+  // These checks are already performed by the accessPolicyMiddleware and 
+  // would therefore be redundant
+  // ----------------------------------------------------------------
+  // if (files.length > 0) {
+  //   fileUploadPath = files[0];
+  // }
 
-  if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
-    console.log(`No distinctive file found for ${fileId}.`);
-    resCallback(404, `No file found for ${fileId}.`);
-    return;
-  }
+  // if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
+  //   console.log(`No distinctive file found for ${fileId}.`);
+  //   resCallback(404, `No file found for ${fileId}.`);
+  //   return;
+  // }
 
-  return fs.readFileSync(fileUploadPath);
+  console.log("formatting ...")
+  var filename = fileUploadPath.replace(/^.*[\\\/]/, "");
+  var filebuffer = fs.readFileSync(fileUploadPath);
+  console.log("collected ", filename);
+  return {filebuffer: filebuffer, filename: filename};
 }

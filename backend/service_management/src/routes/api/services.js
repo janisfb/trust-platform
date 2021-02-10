@@ -2,6 +2,7 @@ const Router = require("express").Router;
 const serviceCreationMiddleware = require("../../middleware/serviceCreationMiddleware");
 const serviceController = require("../../controllers/serviceController.js");
 const serviceExecutionController = require("../../controllers/serviceExecutionController.js");
+const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
 
 /**
  * routes for adding services and getting a list of the available services
@@ -38,7 +39,7 @@ module.exports = Router({ mergeParams: true })
       });
     }
   })
-  .get("/services/:serviceId/:fileId", async (req, res, next) => {
+  .get("/services/:serviceId/:fileId", accessPolicyMiddleware.isAccessAuthorized, async (req, res, next) => {
     try {
       const callback = (status, message) => {
         res.status(status).send(message);
@@ -49,6 +50,7 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
+      console.log("error upon routing: ",error);
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,

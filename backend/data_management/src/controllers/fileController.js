@@ -63,15 +63,18 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
 
   if (config.CONSOLE_LOGGING) console.log("file can be replaced", files);
 
-  if (files.length > 0) {
-    fileUploadPath = files[0];
-  }
+  // These checks are already performed by the accessPolicyMiddleware and
+  // would therefore be redundant
+  // ----------------------------------------------------------------
+  // if (files.length > 0) {
+  //   fileUploadPath = files[0];
+  // }
 
-  if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
-    console.log(`No distinctive file found for ${reqFileId}.`);
-    resCallback(404, `No file found for ${reqFileId}.`);
-    return;
-  }
+  // if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
+  //   console.log(`No distinctive file found for ${reqFileId}.`);
+  //   resCallback(404, `No file found for ${reqFileId}.`);
+  //   return;
+  // }
 
   // input field containing the file
   const uploadFile = reqFiles.uploadFile;
@@ -99,19 +102,20 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
 exports.deleteFile = function (reqFileId, resCallback) {
   let fileUploadPath;
 
-  var files = glob.sync(
-    `${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`
-  );
+  var files = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`);
 
-  if (files.length > 0) {
-    fileUploadPath = files[0];
-  }
+  // These checks are already performed by the accessPolicyMiddleware and
+  // would therefore be redundant
+  // ----------------------------------------------------------------
+  // if (files.length > 0) {
+  //   fileUploadPath = files[0];
+  // }
 
-  if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
-    console.log(`No distinctive file found for ${reqFileId}.`);
-    resCallback(404, `No file found for ${reqFileId}.`);
-    return;
-  }
+  // if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
+  //   console.log(`No distinctive file found for ${reqFileId}.`);
+  //   resCallback(404, `No file found for ${reqFileId}.`);
+  //   return;
+  // }
 
   try {
     fs.unlinkSync(fileUploadPath);
