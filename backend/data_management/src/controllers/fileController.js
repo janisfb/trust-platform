@@ -100,8 +100,6 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
  * @param {*} resCallback The callback containing the result of the operation.
  */
 exports.deleteFile = function (reqFileId, resCallback) {
-  let fileUploadPath;
-
   var files = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`);
 
   // These checks are already performed by the accessPolicyMiddleware and
@@ -117,6 +115,7 @@ exports.deleteFile = function (reqFileId, resCallback) {
   //   return;
   // }
 
+  let fileUploadPath = files[0];
   try {
     fs.unlinkSync(fileUploadPath);
     if (config.CONSOLE_LOGGING)
