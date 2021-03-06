@@ -18,6 +18,11 @@
         <b-navbar-item tag="router-link" :to="{ path: '/logs' }">
           Souveränität
         </b-navbar-item>
+        <b-navbar-dropdown v-if="isAdmin" label="Debug">
+            <b-navbar-item target="_blank" href="http://localhost:9100/">
+              Kafdrop
+            </b-navbar-item>
+        </b-navbar-dropdown>
       </template>
 
       <template #end>

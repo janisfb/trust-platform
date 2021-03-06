@@ -9,3 +9,7 @@ body {
   border-color: $primary !important;
   color: #fff;
 }
+
+.navbar-link:not(.is-arrowless)::after {
+  border-color: $primary !important;
+}
