@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  # -------------------------------------------------------------------------------- 
+  #   a. Backend services
+  # --------------------------------------------------------------------------------
   # Manages the files (upload, delete, modify) 
   data_management:
     build: 
@@ -33,6 +36,9 @@ services:
     ports:
       - 27017:27017  
 
+  # -------------------------------------------------------------------------------- 
+  #   b. frontend
+  # --------------------------------------------------------------------------------
   # # vue frontend // platform
   # frontend:
   #   build:
@@ -43,7 +49,12 @@ services:
   #   ports: 
   #     - 8080:8080
 
-  # kafka is built on zookeeper
+  # -------------------------------------------------------------------------------- 
+  #   c. Full Kafka setup
+  #       - Zookeeper
+  #       - Kafka
+  #       - Kafdrop (for debug)
+  # --------------------------------------------------------------------------------
   zookeeper:
     image: bitnami/zookeeper:3-debian-10
     ports:
@@ -75,7 +86,51 @@ services:
     depends_on:
       - kafka
 
-  # api gateway
+  # -------------------------------------------------------------------------------- 
+  #   c. ELK Stack
+  #       - Logstash
+  #       - Elasticsearch
+  #       - Kibana
+  # --------------------------------------------------------------------------------
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.4.0
+    container_name: logstash
+    # It Links elasticsearch container & kafkaserver container  & logstash container to communicate
+    links:
+      - elasticsearch:elasticsearch
+      - kafka:kafka
+    depends_on: 
+      - elasticsearch
+      - kafka
+    # Mount host volumes into docker containers to supply logstash.config file
+    volumes:
+      - './logstash-config/:/usr/share/logstash/pipeline/'
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+    container_name: elasticsearch
+    # Make a port available to services outside of Docker
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.4.0
+    container_name: kibana
+    # Make a port available to services outside of Docker
+    ports:
+      - 5601:5601
+    # It Links kibana container & elasticsearch container to communicate
+    links:
+      - elasticsearch:elasticsearch
+    # You can control the order of service startup and shutdown with the depends_on option.
+    depends_on: 
+      - elasticsearch
+
+
+  # -------------------------------------------------------------------------------- 
+  #   e. KONG api gateway
+  # -------------------------------------------------------------------------------- 
   kong:
     image: kong:latest
     volumes:
