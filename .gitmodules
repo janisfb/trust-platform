@@ -1,0 +1,3 @@
+[submodule "trust-logger-ba"]
+	path = trust-logger-ba
+	url = https://github.com/janisfb/trust-logger-ba.git
