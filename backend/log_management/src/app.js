@@ -1,15 +1,9 @@
 const express = require("express");
-const fileUpload = require("express-fileupload");
 
 const router = require("./routes/createRouter")();
 const config = require("./config/config");
 
 const app = express();
-
-
-app.use(fileUpload({
-  limits: { fileSize: config.FILE_SIZE },
-}));
 
 app.use("/api", router);
 

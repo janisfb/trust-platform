@@ -123,7 +123,7 @@ exports.deleteFile = function (reqFileId, resCallback) {
     resCallback(200, `File ${reqFileId} was deleted!`);
     return;
   } catch (error) {
-    resCallback(500, err);
+    resCallback(500, error);
   }
 }
 

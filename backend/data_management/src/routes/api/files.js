@@ -1,7 +1,16 @@
 const Router = require("express").Router;
 const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
 const fileController = require("../../controllers/fileController");
+const TrustLogger = require("trust-logger-ba");
+
 const config = require("../../config/config");
+
+const Logger = new TrustLogger(
+  "kafka:9092",
+  "data_management",
+  "logs",
+  "data_management"
+);
 
 /**
  * routes for file manipulation operations
@@ -28,8 +37,11 @@ module.exports = Router({ mergeParams: true })
   })
   .get("/files", async (req, res, next) => {
     try {
-      const callback = (status, message) => {
-        res.status(status).send(message);
+      const callback = (status, message) => { 
+        var data = [];
+        message.forEach(obj => data.push({owner:obj.creator,id:obj.id,name:obj.fileName}));
+        Logger.log(req, "Use", true, data, "file information requested by user");
+        res.status(status).send(message);       
       };
       fileController.getUserFiles(
         req.headers["x-consumer-username"],

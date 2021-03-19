@@ -1,5 +1,5 @@
 const Service = require("../models/Service");
-var path = require("path");
+const path = require("path");
 const config = require("../config/config");
 
 /**
