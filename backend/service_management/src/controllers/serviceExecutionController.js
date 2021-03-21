@@ -1,4 +1,5 @@
 var fs = require("fs");
+var path = require("path");
 const glob = require("glob");
 
 const config = require("../config/config");
@@ -12,7 +13,9 @@ const config = require("../config/config");
  */
 exports.executeService = function (reqServiceId, reqFileId, resCallback) {
   if (reqServiceId == "undefined" || reqFileId == "undefined") {
-    console.log(`Wrong params. ${reqServiceId}, ${reqFileId}`);
+    if (config.CONSOLE_LOGGING) {
+      console.log(`Wrong params. ${reqServiceId}, ${reqFileId}`);
+    }
     resCallback(400, "Wrong params.");
     return;
   }
@@ -27,14 +30,26 @@ exports.executeService = function (reqServiceId, reqFileId, resCallback) {
 
   try {
     const serviceCallback = (status, result) => {
-      resCallback(status, result);
+      console.log("FILE NAME:",fileObj.filename);
+      var fileInfo = getFileInfo(fileObj.filename);
+      var response = {
+        result,
+        service: {
+          name: servicePath.replace(/^.*[\\\/]/, ""),
+          id: reqServiceId,
+        },
+        file: fileInfo,
+      };
+      resCallback(status, response);
     };
     service.execute(fileObj, serviceCallback);
   } catch (err) {
-    console.log(
-      `Something went wrong while trying to execute the service with id ${reqServiceId}`,
-      err
+    if (config.CONSOLE_LOGGING) {
+      console.log(
+        `Something went wrong while trying to execute the service with id ${reqServiceId}`,
+        err
       );
+    }
     resCallback(500, "Something went wrong.");
   }
 };
@@ -57,7 +72,8 @@ const getService = (serviceId, resCallback) => {
   }
 
   if (files.length > 1 || !fs.existsSync(serviceUploadPath)) {
-    console.log(`No distinctive service found for ${serviceId}.`);
+    if (config.CONSOLE_LOGGING)
+      console.log(`No distinctive service found for ${serviceId}.`);
     resCallback(404, `No service found for ${serviceId}.`);
     return;
   }
@@ -92,10 +108,49 @@ const getFile = (fileId, resCallback) => {
   //   resCallback(404, `No file found for ${fileId}.`);
   //   return;
   // }
+  if (!fs.existsSync(fileUploadPath)) {
+    resCallback(404, `No file found for id ${reqFileId}.`);
+    return;
+  }
 
-  console.log("formatting ...")
+  if (config.CONSOLE_LOGGING) console.log("formatting ...")
   var filename = fileUploadPath.replace(/^.*[\\\/]/, "");
   var filebuffer = fs.readFileSync(fileUploadPath);
-  console.log("collected ", filename);
+  if (config.CONSOLE_LOGGING) console.log("collected ", filename);
   return {filebuffer: filebuffer, filename: filename};
 }
+
+/**
+ * Gets the stats to a single file.
+ * The stats are: id, fileName, creator, fileSizeInBytes, creationTime, lastAccessTime, lastModifiedTime
+ *
+ * @param {string} file The file name.
+ * @returns An objects with the files stats.
+ */
+const getFileInfo = (file) => {
+  const filePath = path.join(config.FILE_UPLOAD_DIRECTORY, file);
+  var fileStats = fs.statSync(filePath);
+  const splittedName = file.split("-");
+
+  const id = splittedName[1];
+  const fileName = splittedName[3];
+  const creator = splittedName[0];
+  const fileSizeInBytes = fileStats.size;
+
+  var dateObj = new Date(splittedName[2] * 1000);
+  var utcString = dateObj.toISOString();
+  const creationTime = utcString;
+
+  const lastAccessTime = fileStats.atime;
+  const lastModifiedTime = fileStats.mtime;
+
+  return {
+    id: id,
+    fileName: fileName,
+    creator: creator,
+    fileSizeInBytes: fileSizeInBytes,
+    creationTime: creationTime,
+    lastAccessTime: lastAccessTime,
+    lastModifiedTime: lastModifiedTime,
+  };
+};

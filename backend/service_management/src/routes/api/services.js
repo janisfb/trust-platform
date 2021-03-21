@@ -3,9 +3,20 @@ const serviceCreationMiddleware = require("../../middleware/serviceCreationMiddl
 const serviceController = require("../../controllers/serviceController.js");
 const serviceExecutionController = require("../../controllers/serviceExecutionController.js");
 const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
+const TrustLogger = require("trust-logger-ba");
+
+const config = require("../../config/config");
+
+const Logger = new TrustLogger(
+  "kafka:9092",
+  "data_management",
+  "logs",
+  "data_management"
+);
 
 /**
- * routes for adding services and getting a list of the available services
+ * routes for adding services, getting a list of the available services 
+ * and executing services on data
  */
 module.exports = Router({ mergeParams: true })
   .post(
@@ -42,6 +53,47 @@ module.exports = Router({ mergeParams: true })
   .get("/services/:serviceId/:fileId", accessPolicyMiddleware.isAccessAuthorized, async (req, res, next) => {
     try {
       const callback = (status, message) => {
+        if(status == 200) {
+          // log the data use by the service
+          var data = {
+            owner: message.file.creator,
+            id: message.file.id,
+            name: message.file.fileName,
+          };
+          var serviceName = message.service.name.split("_")[1].split(".")[0];
+          Logger.log(
+            req,
+            "Use",
+            true,
+            data,
+            `service '${serviceName}' with id '${message.service.id}' used`
+          );
+
+          // if external services are used log that data was shared
+          const externalCallback = (externalService) => {
+            if (externalService != null)
+              Logger.log(
+                req,
+                "Share",
+                true,
+                data,
+                `shared data with external service '${externalService}'`
+              );
+          };
+          serviceController.usesExternal(
+            req.params.serviceId,
+            externalCallback
+          );
+        } else {
+          Logger.log(
+            req,
+            "Use",
+            false,
+            { owner: "-", id: req.params.fileId, name: "-" },
+            `'${serviceName}' service execution failed: ${message}`
+          );
+        }
+
         res.status(status).send(message);
       };
       serviceExecutionController.executeService(
@@ -51,6 +103,13 @@ module.exports = Router({ mergeParams: true })
       );
     } catch (error) {
       console.log("error upon routing: ",error);
+      Logger.log(
+        req,
+        "Use",
+        false,
+        { owner: "-", id: req.params.fileId, name: "-" },
+        `'${serviceName}' service execution failed`
+      );
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,

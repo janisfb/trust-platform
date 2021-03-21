@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ServiceSchema = new Schema({
+  _id: {
+    type: String,
+  },
   company: {
     type: String,
     required: true,

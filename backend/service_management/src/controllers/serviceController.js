@@ -120,3 +120,21 @@ exports.getServices = function (resCallback) {
       resCallback(404, "No services found!");
     });
 };
+
+/**
+ * Checks if a service uses external services.
+ * Returns name of the service if yes and null if no.
+ * 
+ * @param {string} serviceId The id of the service
+ * @param {*} serviceCallback The callback containing externalService name or null
+ */
+exports.usesExternal = function (serviceId, serviceCallback) {
+  console.log("service logoger: ", serviceId);
+  Service.findById(serviceId, function (err, service) {
+    if (err) {
+      return `error while fetching service with id '${serviceId}'`;
+    }
+
+    serviceCallback(service.usesExternalService ? service.externalServiceName : null);
+  });
+};

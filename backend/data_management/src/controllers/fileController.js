@@ -24,10 +24,11 @@ exports.uploadFile = function (reqFiles, reqUsername, resCallback) {
 
   // input field containing the file
   const uploadFile = reqFiles.uploadFile;
+  const uploadFileName = uniqid(`${reqUsername}-`,`-${new Date().getTime() / 1000}-${uploadFile.name}`);
 
   const fileUploadPath = path.join(
     config.UPLOAD_DIRECTORY,
-    uniqid(`${reqUsername}-`,`-${new Date().getTime() / 1000}-${uploadFile.name}`)
+    uploadFileName
   );
 
   // the created temp file will be moved to the users directory
@@ -40,7 +41,14 @@ exports.uploadFile = function (reqFiles, reqUsername, resCallback) {
 
     if (config.CONSOLE_LOGGING)
       console.log(`File uploaded to ${fileUploadPath}!`);
-    resCallback(200, "File uploaded!");
+
+    var fileInfo = getFileInfo(uploadFileName);
+
+    var response = {
+      message: `File uploaded!`,
+      file: fileInfo,
+    };
+    resCallback(200, response);
   });
 };
 
@@ -58,10 +66,9 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
     return;
   }
 
-  let fileUploadPath;
-  var files = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`);
+  var fileUploadPath = glob.sync(`${config.UPLOAD_DIRECTORY}/*-${reqFileId}-*`)[0];
 
-  if (config.CONSOLE_LOGGING) console.log("file can be replaced", files);
+  if (config.CONSOLE_LOGGING) console.log("file can be replaced", fileUploadPath);
 
   // These checks are already performed by the accessPolicyMiddleware and
   // would therefore be redundant
@@ -79,6 +86,11 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
   // input field containing the file
   const uploadFile = reqFiles.uploadFile;
 
+  if (!fs.existsSync(fileUploadPath)) {
+    resCallback(404, `No file found for id ${reqFileId}.`);
+    return;
+  }
+
   // the created temp file will be moved to the users directory
   uploadFile.mv(fileUploadPath, function (err) {
     if (err) {
@@ -89,7 +101,14 @@ exports.updateFile = function (reqFileId, reqFiles, resCallback) {
 
     if (config.CONSOLE_LOGGING)
       console.log(`File at ${fileUploadPath} updated!`);
-    resCallback(200, `File ${reqFileId} updated!`);
+    
+    var fileInfo = getFileInfo(fileUploadPath.replace(/^.*[\\\/]/, ""));
+
+    var response = {
+      message: `File ${reqFileId} updated!`,
+      file: fileInfo,
+    };
+    resCallback(200, response);
   });
 };
 
@@ -116,11 +135,28 @@ exports.deleteFile = function (reqFileId, resCallback) {
   // }
 
   let fileUploadPath = files[0];
+
+  if (!fs.existsSync(fileUploadPath)) {
+    resCallback(404, `No file found for id ${reqFileId}.`);
+    return;
+  }
+
   try {
+    var fileInfo = getFileInfo(fileUploadPath.replace(/^.*[\\\/]/, ""));
+
+    var response = {
+      message: `File at ${reqFileId} was deleted!`,
+      file: fileInfo,
+    };
+
+    console.log(response);
+
     fs.unlinkSync(fileUploadPath);
+
     if (config.CONSOLE_LOGGING)
       console.log(`File at ${fileUploadPath} deleted!`);
-    resCallback(200, `File ${reqFileId} was deleted!`);
+
+    resCallback(200, response);
     return;
   } catch (error) {
     resCallback(500, error);

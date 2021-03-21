@@ -21,6 +21,18 @@ module.exports = Router({ mergeParams: true })
   .post("/files", async (req, res, next) => {
     try {
       const callback = (status, message) => {
+        // trigger log message
+        if(status == 200) {
+          var data = {
+            owner: message.file.creator,
+            id: message.file.id,
+            name: message.file.fileName,
+          };
+          Logger.log(req, "Store", true, data, "");
+        } else {
+          Logger.log(req, "Store", false, null, `upload failed: ${message}`);
+        }
+
         res.status(status).send(message);
       };
       fileController.uploadFile(
@@ -29,6 +41,7 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
+      Logger.log(req, "Change", false, null, "could not upload the file");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
@@ -38,9 +51,15 @@ module.exports = Router({ mergeParams: true })
   .get("/files", async (req, res, next) => {
     try {
       const callback = (status, message) => { 
-        var data = [];
-        message.forEach(obj => data.push({owner:obj.creator,id:obj.id,name:obj.fileName}));
-        Logger.log(req, "Use", true, data, "file information requested by user");
+        // trigger log message
+        if(status == 200) {
+          var data = [];
+          message.forEach(obj => data.push({owner:obj.creator,id:obj.id,name:obj.fileName}));
+          Logger.log(req, "Use", true, data, "file information requested by user");
+        } else {
+          Logger.log(req, "Use", false, null, `could not get user files: ${message}`);
+        }
+
         res.status(status).send(message);       
       };
       fileController.getUserFiles(
@@ -48,6 +67,7 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
+      Logger.log(req, "Change", false, null, "could not get user files");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
@@ -57,6 +77,24 @@ module.exports = Router({ mergeParams: true })
   .post("/files/:id", accessPolicyMiddleware.isAccessAuthorized, async (req, res, next) => {
     try {
       const callback = (status, message) => {
+        // trigger log message
+        if(status == 200) {
+          var data = {
+            owner: message.file.creator,
+            id: message.file.id,
+            name: message.file.fileName,
+          };
+          Logger.log(req, "Change", true, data, "file changed/replaced by user");
+        } else {
+          Logger.log(
+            req,
+            "Change",
+            false,
+            { owner: "-", id: req.params.id, name: "-" },
+            `file change/replace failed: ${message}`
+          );
+        }
+
         res.status(status).send(message);
       };
       fileController.updateFile(
@@ -65,6 +103,7 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
+      Logger.log(req, "Change", false, { owner:"-", id:req.params.id, name:"-" }, "file change/replace failed");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
@@ -74,6 +113,24 @@ module.exports = Router({ mergeParams: true })
   .delete("/files/:id", accessPolicyMiddleware.isAccessAuthorized, async (req, res, next) => {
     try {
       const callback = (status, message) => {
+        // trigger log message
+        if(status == 200) {
+          var data = {
+            owner: message.file.creator,
+            id: message.file.id,
+            name: message.file.fileName,
+          };
+          Logger.log(req, "destroy", true, data, "file deleted by user");
+        } else {
+          Logger.log(
+            req,
+            "destroy",
+            false,
+            { owner: "-", id: req.params.id, name: "-" },
+            `file deletion failed: ${message}`
+          );
+        }
+
         res.status(status).send(message);
       };
       fileController.deleteFile(
@@ -81,6 +138,7 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
+      Logger.log(req, "destroy", false, { owner:"-", id:req.params.id, name:"-" }, "file deletion failed");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
