@@ -251,6 +251,7 @@
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
 import { extend } from 'vee-validate';      
 import { required, email, min, max } from 'vee-validate/dist/rules';
+import axios from "axios";
 
 export default {
   name: "ServiceCreatorComponent",
@@ -333,7 +334,43 @@ export default {
           this.sovereignty.externalService.name = "Not Applicable";
           this.sovereignty.externalService.reason = "Not Applicable";
         }
-        console.log("to the moon");
+        
+        return new Promise((resolve, reject) => {
+          let formData = new FormData();
+          formData.append("uploadFile", this.file);
+          formData.append("company",this.contact.company);
+          formData.append("url",this.contact.url);
+          formData.append("email",this.contact.email);
+          formData.append("tel",this.contact.tel);
+          formData.append("name",this.serviceMeta.name);
+          formData.append("version",this.serviceMeta.version);
+          formData.append("description",this.serviceMeta.description);
+          formData.append("needsFullAccess",this.sovereignty.needsFullAccess);
+          formData.append("accessReason",this.sovereignty.accessReason);
+          formData.append("usesExternalService",this.sovereignty.usesExternalService);
+          formData.append("externalServiceName",this.sovereignty.externalService.name);
+          formData.append("externalServiceReason",this.sovereignty.externalService.reason);
+          axios.post("/api/services",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              }
+            })
+            .then((resp) => {
+              console.log(resp);
+              this.file = null;
+              this.errorText = "";
+              this.openSuccessToast("Datei erfolgreich hochgeladen!");
+              this.$store.dispatch("getFiles");
+              resolve();
+            })
+            .catch((err) => {
+              console.log("Something went wrong while uploading the file!");
+              this.errorText = "Die Datei konnte nicht hochgeladen werden!"
+              reject(err);
+            });
+        });
       }
     },
     async fillWithExampleValues() {

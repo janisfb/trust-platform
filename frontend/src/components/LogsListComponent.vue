@@ -15,12 +15,13 @@
           size="is-large"
           multilined dashed>
           <template v-slot:content>
-            <p class="pb-2">Systemereignissen wird automatisch ein Schweregrad zugewiesen:</p>
+            <p class="pb-2">Aktionen wird automatisch ein Schweregrad zugewiesen (oben->unten =^ links->rechts):</p>
             <ul style="text-align: left;">
-              <li><b class="list-border-right mr-2">1</b>Im Standardablauf erwartbare Ereignisse.</li>
-              <li><b class="list-border-right mr-2">2</b>Unerwartete, aber harmlose Ereignisse.</li>
-              <li><b class="list-border-right mr-2">3</b>Potentiell gefährliche Ereignisse.</li>
-              <li><b class="list-border-right mr-2">4</b>Sicherheitsrisiken.</li>
+              <li><b class="list-border-right mr-2">B</b>Unerwartete Ereignisse / Fehler.</li>
+              <li><b class="list-border-right mr-2">1</b>Niedriges Risiko für Datensouveränität.</li>
+              <li><b class="list-border-right mr-2">2</b>Mittleres Risiko für Datensouveränität.</li>
+              <li><b class="list-border-right mr-2">3</b>Hohes Risiko für Datensouveränität.</li>
+              <li><b class="list-border-right mr-2">4</b>Sehr hohes Risiko für Datensouveränität.</li>
             </ul>
           </template>
           <h1>Schwere:</h1>
@@ -61,6 +62,10 @@
     <div v-else class="container">
       <b-table
         hoverable
+        detailed
+        detail-key="_id"
+        default-sort="_source.priority"
+        default-sort-direction="desc"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
         aria-page-label="Page"
@@ -69,63 +74,164 @@
         :paginated="true"
         :per-page="this.computePageSize"
         :current-page.sync="currentPage"
+        :opened-detailed="defaultOpenedDetails"
         :pagination-position="paginationPosition"
+        @details-open="(row, index) => closeOtherDetail(row)"
       >
         <b-table-column
           class="ta"
-          field="severity"
-          label="Schwere"
+          field="_source.priority"
+          label="P"
           sortable
           v-slot="props"
-          :width="110"
+          :width="10"        
         >
-          <div class="ta">{{ `${checkboxValues.indexOf(props.row.severity)} - ${props.row.severity}` }}</div>
+          <div class="ta" v-bind:class="formatByPriority(props.row)">
+            {{ props.row._source.priority }}
+          </div>
         </b-table-column>
 
         <b-table-column
-          field="time"
+          field="_source.time"
           label="Zeitstempel"
           sortable
           v-slot="props"
           :width="180"
         >
-          {{ new Date(props.row.time).toLocaleString() }}
+          <div v-bind:class="formatByPriority(props.row)">
+            {{ new Date(props.row._source.time).toLocaleString() }}
+          </div>
         </b-table-column>
 
         <b-table-column
           class="ta"
-          field="user"
+          field="_source.user_name"
           label="Nutzer"
           v-slot="props"
-          :width="180"
+          :width="120"
         >
-          <div class="ta">{{ props.row.user }}</div>
+          <div class="ta" v-bind:class="formatByPriority(props.row)">
+            {{ props.row._source.user_name }}
+          </div>
         </b-table-column>
 
         <b-table-column
-          field="category"
+          field="_source.category"
           label="Kategorie"
           v-slot="props"
-          :width="180"
+          :width="120"
         >
-          <div class="ta">{{ props.row.category }}</div>
+          <div class="ta" v-bind:class="formatByPriority(props.row)">
+            {{ props.row._source.category }}
+          </div>
         </b-table-column>
 
         <b-table-column
-          field="action"
+          field="_source.reason"
           label="Aktion"
           v-slot="props"
         >
-          <div class="ta">{{ props.row.action }}</div>
+          <div class="ta" v-bind:class="formatByPriority(props.row)">
+            {{ props.row._source.reason }}
+          </div>
         </b-table-column>
 
         <b-table-column
-          field="object"
-          label="Betroffene Datei"
+          field="_source.data_name"
+          label="Datei"
           v-slot="props"
         >
-          <div class="ta">{{ props.row.object }}</div>
+          <div class="ta ta-truncate" v-bind:class="formatByPriority(props.row)">            
+            {{ props.row._source.data_name }}
+          </div>
         </b-table-column>
+
+        <b-table-column
+          field="_source.data_name"
+          label="Besitzer"
+          v-slot="props"
+          :width="120"
+        >
+          <div class="ta" v-bind:class="formatByPriority(props.row)">
+            {{ props.row._source.data_owner }}
+          </div>
+        </b-table-column>
+
+        <b-table-column
+          label="Filter"
+          v-slot="props"
+          :width="40"          
+        >
+          <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
+            <div v-if="props.row._source.data_name != '-'" v-on:click="searchForFile(props.row._source.data_id)">
+              <b-tooltip
+                multilined
+                type="is-light"
+                label="Logs nach dieser Datei filtern"
+              >
+                <b-icon class="zoom" icon="file-search-outline"></b-icon>
+              </b-tooltip>
+            </div>
+            <div v-on:click="searchForSession(props.row._source.session)">
+              <b-tooltip
+                multilined
+                type="is-light"
+                label="Logs nach dieser Session filtern"
+              >
+                <b-icon class="zoom" icon="layers-search-outline"></b-icon>
+              </b-tooltip>
+            </div>
+          </div>
+        </b-table-column>
+
+        <template #detail="props">
+          <div class="level">
+            <div class="level-left">
+              <h1>ID: {{ props.row.id }}</h1>
+              <b-tag
+                class="ml-5"
+                v-if="props.row.creator != username"
+                type="is-warning"
+                Colored
+                tag
+                label
+              >
+                Keine eigene Datei
+              </b-tag>
+            </div>
+            <div class="buttons are-small">
+              <b-button icon-left="file-search">Souveränitätsdaten</b-button>
+              <b-button 
+                @click="launchReplaceModal()"
+                icon-left="file-replace"
+              >
+                Datei ersetzen
+              </b-button>
+              <b-button 
+                @click="confirmDelete(props.row)"
+                class="is-danger" 
+                icon-left="delete"
+              >
+                Datei löschen
+              </b-button
+              >
+            </div>
+          </div>
+          <b-modal v-model="isReplaceModalActive" :width="400">
+              <div class="box" style="padding: 0px">
+                <section class="hero is-light">
+                  <div class="hero-body">
+                    <h1 class="title">Datei ersetzen</h1>
+                    <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                  </div>
+                </section>
+                <section style="padding: 1.5rem; padding-left: 3em;">
+                  <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
+                  <file-upload-component :replaceId="props.row.id"></file-upload-component>
+                </section>
+              </div>
+            </b-modal>
+        </template>  
       </b-table>
     </div>
   </section>
@@ -142,16 +248,17 @@ export default {
       data,
       paginationPosition: "bottom",
       currentPage: 1,
+      defaultOpenedDetails: [],
       perPage: 8,
 
-      checkboxValues: ["bug", "info", "warning", "error", "alarm"],
-      prioCheckboxDynamic: ["bug", "info", "warning", "error", "alarm"],
+      checkboxValues: ["bug", 1, 2, 3, 4],
+      prioCheckboxDynamic: ["bug", 1, 2, 3, 4],
 
       // modal config + search query
-      isCreatorModalActive: false,
-      isInfoModalActive: false,
-      modalInformation: {},
       searchQuery: "",
+
+      // fetchError text when fetch of logs failed
+      fetchError: "",
     };
   },
   components: {
@@ -187,48 +294,105 @@ export default {
       }
     },
     /**
+     * Gets the data (in this case the logs) from the vuex store.
+     * 
+     * @returns {any[]} A list containing all fetched data.
+     */
+    logs() {
+      return this.$store.getters.getLogs;
+    },
+    /**
      * Filters the data with the searchQuery and the prioCheckBox.
-     * Searchable: name, creator and version
-     * Prios: debug, info, warn, error, alarm
+     * Searchable: source_name, source_ip, user_name, user_ip, session,
+     *  category, status, data_owner, data_id, data_name, reason
+     * Prios: 1-4
      *
      * @returns A list containing the matching data
      */
     filter() {
       var name_re = new RegExp(this.searchQuery, "i");
       var dataFiltered = [];
-      for (var i in this.data) {
+      for (var i in this.logs) {
+        var log = this.logs[i]._source;
+        if(log.category == "destroy") console.log("filter:",log)
         if (
-          (this.data[i].time.match(name_re) ||
-          this.data[i].category.match(name_re) ||
-          this.data[i].action.match(name_re) ||
-          this.data[i].user.match(name_re)) &&
-          (this.prioCheckboxDynamic.indexOf(this.data[i].severity) >= 0)
+          (new Date(log.time)
+              .toLocaleString()
+              .match(name_re) ||
+          (this.logs[i]._id.match(name_re)) ||
+          (log.source_name != null && log.source_name.match(name_re)) ||
+          (log.source_ip != null && log.source_ip.match(name_re)) ||
+          (log.user_name != null && log.user_name.match(name_re)) ||
+          (log.user_ip != null && log.user_ip.match(name_re)) ||
+          (log.session != null && log.session.match(name_re)) ||
+          (log.category != null && log.category.match(name_re)) ||
+          (log.status != null && log.status.match(name_re)) ||
+          (log.data_owner != null && log.data_owner.match(name_re)) ||
+          (log.data_id != null && log.data_id.match(name_re)) ||
+          (log.data_name != null && log.data_name.match(name_re)) ||
+          (log.reason != null && log.reason.match(name_re))) &&
+          (this.prioCheckboxDynamic.indexOf(log.priority) >= 0 ||
+          (log.status != "success" && this.prioCheckboxDynamic.indexOf("bug") >= 0))
         ) {
-          dataFiltered.push(this.data[i]);
+          dataFiltered.push(this.logs[i]);
         }
       }
       return dataFiltered;
     },
   },
   methods: {
-    /**
-     * Launches the service info modal.
-     */
-    launchServiceInfoModal(row) {
-      this.modalInformation = row;
-      this.isInfoModalActive = true;
+    formatByPriority(row) {
+      return {
+        'has-text-orange': row._source.priority == 3,
+        'has-text-red': row._source.priority == 4,
+      };
     },
     /**
-     * Launches the service creator modal.
+     * Tries to refetch the logs.
      */
-    launchServiceCreatorModal() {
-      this.isCreatorModalActive = true;
+    retryLogFetch() {
+      this.$store
+        .dispatch("getLogs")
+        .catch((error) => {
+          this.fetchError = "Die Logs konnten nicht geladen werden!";
+          console.log(error);
+        });
+      this.fetchError = "";
     },
+    /**
+     * Closes the other detail view by setting the
+     * 'opened' variable to the current row.
+     */
+    closeOtherDetail(row) {
+      this.defaultOpenedDetails = [row._id];
+    },
+    searchForFile(fileId) {
+      this.searchQuery = fileId;
+    },
+    searchForSession(sessionId) {
+      this.searchQuery = sessionId;
+    }
+  },
+  /**
+   * When the logsComponent is created the logs have to get loaded.
+   */
+  created() {
+    // if(this.$store.getters.getFiles == [])
+    this.$store
+      .dispatch("getLogs")
+      .catch((error) => {
+        this.fetchError = "Die Logs konnten nicht geladen werden!";
+        console.log(error);
+      });
+
+    var paramsQuery = this.$route.params.query;
+    if(paramsQuery != "" || paramsQuery != null) {
+      this.searchQuery = paramsQuery;
+    }
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .b-table .level:not(.top) {
   padding-bottom: 0rem;
@@ -247,8 +411,25 @@ export default {
   text-align: left;
 }
 
+.ta-truncate {
+  max-width: 250px;
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  overflow: hidden; 
+}
+
 .list-border-right {
   border: 1px solid aqua;
   padding: 1px;
 }
+
+.has-text-orange {
+  color: orangered;
+}
+
+.has-text-red {
+  color: red;
+  font-weight: bold;
+}
+
 </style>

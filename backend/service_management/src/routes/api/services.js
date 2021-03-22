@@ -9,9 +9,9 @@ const config = require("../../config/config");
 
 const Logger = new TrustLogger(
   "kafka:9092",
-  "data_management",
+  "service_management",
   "logs",
-  "data_management"
+  "service_management"
 );
 
 /**
@@ -27,6 +27,7 @@ module.exports = Router({ mergeParams: true })
         const callback = (status, message) => {
           res.status(status).send(message);
         };
+        console.log("reached next stop");
         console.log(req.body);
         serviceController.createService(req.body, req.files, callback);
       } catch (error) {

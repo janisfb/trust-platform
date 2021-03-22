@@ -167,23 +167,23 @@ exports.deleteFile = function (reqFileId, resCallback) {
  * Gets all the files that the user is allowed to perform operations on.
  *
  * @param {string} reqUsername The username that is associated with the request.
+ * @param {boolean} allFiles Return all files including files not owned by the user (only admin)
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
-exports.getUserFiles = function (reqUsername, resCallback) {
+exports.getUserFiles = function (reqUsername, allFiles, resCallback) {
   const files = fs.readdirSync(config.UPLOAD_DIRECTORY);
-
-  if (config.CONSOLE_LOGGING) console.log(`got ${files.length} files`);
 
   var response = [];
 
   //get information about all available files
   for (let file of files) {
-    if (reqUsername == "admin" || path.basename(file).split("-")[0] == reqUsername) {
+    if ((allFiles && reqUsername == "admin") || path.basename(file).split("-")[0] == reqUsername) {
       response.push(getFileInfo(file));
     }
   }
 
-  if (config.CONSOLE_LOGGING) console.log(response);
+  
+  if (config.CONSOLE_LOGGING) console.log(`got ${response.length} file(s) \n`, response);
   resCallback(200, response);
 };
 

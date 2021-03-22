@@ -10,10 +10,12 @@ export default new Vuex.Store({
     status: "",
     fileStatus: "",
     serviceStatus: "",
+    logStatus: "",
     token: localStorage.getItem("token") || "",
     username: localStorage.getItem("username") || "",
     files: [],
     services: [],
+    logs: [],
     // isAdmin: localStorage.getItem("username") != null ? localStorage.getItem("username") === "admin" : false,
   },
 
@@ -101,6 +103,30 @@ export default new Vuex.Store({
       state.services = services;
       state.serviceStatus = "success";
     },
+
+    /**
+     * Sets the status of log requests to the pending state.
+     * @param {*} state
+     */
+    log_request(state) {
+      state.logStatus = "loading";
+    },
+    /**
+     * Sets the status of log requests to the error state.
+     * @param {*} state
+     */
+    log_error(state) {
+      state.logStatus = "error";
+    },
+    /**
+     * Sets the status of log requests to the success state.
+     * @param {*} state
+     * @param {any[]} param1 List containing the log obj.
+     */
+    log_success(state, logs) {
+      state.logs = logs;
+      state.logStatus = "success";
+    },
   },
 
   actions: {
@@ -134,7 +160,7 @@ export default new Vuex.Store({
             localStorage.setItem("username", user);
 
             axios.defaults.headers.common["Authorization"] = token;
-            
+
             commit("auth_success", {
               token: token,
               username: user,
@@ -161,7 +187,7 @@ export default new Vuex.Store({
                 localStorage.setItem("username", user);
 
                 axios.defaults.headers.common["Authorization"] = token;
-                
+
                 commit("auth_success", {
                   token: token,
                   username: user,
@@ -183,6 +209,7 @@ export default new Vuex.Store({
           });
       });
     },
+
     /**
      * Performs the logout at the Kong Gateway.
      *
@@ -193,7 +220,7 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         commit("logout");
         axios.post("/api/login?session_logout").catch((err) => {
-          if(config.CONSOLE_LOGGING) console.log("Logout failed!", err);
+          if (config.CONSOLE_LOGGING) console.log("Logout failed!", err);
         });
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -218,11 +245,43 @@ export default new Vuex.Store({
           withCredentials: true,
         })
           .then((resp) => {
-            if(config.CONSOLE_LOGGING) console.log(resp);
+            if (config.CONSOLE_LOGGING) console.log(resp);
             commit("file_success", resp.data);
           })
           .catch((err) => {
-            if (config.CONSOLE_LOGGING) console.log("Something went wrong while fetching the files!");
+            if (config.CONSOLE_LOGGING)
+              console.log("Something went wrong while fetching the files!");
+            commit("file_error");
+            reject(err);
+          });
+      });
+    },
+
+    /**
+     * Tries to get all files from the data_management service.
+     * This also includes files that are not owned by the current user.
+     * Only possible for user "admin"
+     *
+     * @param {*} param0
+     * @returns A list containing the file information.
+     */
+    getAllFiles({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit("file_request");
+        axios({
+          url: "/api/files/all",
+          method: "get",
+          responseType: "json",
+          withCredentials: true,
+        })
+          .then((resp) => {
+            if (config.CONSOLE_LOGGING)
+              console.log("requested all files:", resp);
+            commit("file_success", resp.data);
+          })
+          .catch((err) => {
+            if (config.CONSOLE_LOGGING)
+              console.log("Something went wrong while fetching the files!");
             commit("file_error");
             reject(err);
           });
@@ -252,6 +311,34 @@ export default new Vuex.Store({
             if (config.CONSOLE_LOGGING)
               console.log("Something went wrong while fetching the files!");
             commit("service_error");
+            reject(err);
+          });
+      });
+    },
+
+    /**
+     * Gets the logs from the log_management service
+     *
+     * @param {*} param0
+     * @returns A list containing the logs.
+     */
+    getLogs({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit("log_request");
+        axios({
+          url: "/api/logs",
+          method: "get",
+          responseType: "json",
+          withCredentials: true,
+        })
+          .then((resp) => {
+            // console.log(resp);
+            commit("log_success", resp.data.logs);
+          })
+          .catch((err) => {
+            if (config.CONSOLE_LOGGING)
+              console.log("Something went wrong while fetching the logs!");
+            commit("log_error");
             reject(err);
           });
       });
@@ -291,5 +378,12 @@ export default new Vuex.Store({
      * @returns A list containing the services.
      */
     getServices: (state) => state.services,
+
+    /**
+     * Retrieves the logs.
+     * @param {*} state
+     * @returns A list containing the logs.
+     */
+    getLogs: (state) => state.logs,
   },
 });

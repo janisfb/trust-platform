@@ -13,3 +13,12 @@ body {
 .navbar-link:not(.is-arrowless)::after {
   border-color: $primary !important;
 }
+
+.zoom {
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: scale(1.07);
+  }
+}

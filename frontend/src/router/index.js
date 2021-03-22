@@ -10,10 +10,12 @@ import config from "../config/config"
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+  {
     path: "/",
     component: Stage,
-    children: [{
+    children: [
+      {
         path: "",
         name: "Home",
         component: FileView,
@@ -31,6 +33,14 @@ const routes = [{
       },
       {
         path: "logs",
+        name: "Logs",
+        component: LogsView,
+        meta: {
+          requiresAuth: true,
+        },
+      },
+      {
+        path: "logs/filter/:query",
         name: "Logs",
         component: LogsView,
         meta: {

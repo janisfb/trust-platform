@@ -22,6 +22,9 @@
             <b-navbar-item target="_blank" href="http://localhost:9100/">
               Kafdrop
             </b-navbar-item>
+            <b-navbar-item target="_blank" href="http://localhost:5601/">
+              Kibana
+            </b-navbar-item>
         </b-navbar-dropdown>
       </template>
 

@@ -226,7 +226,7 @@ export default {
     },
   },
   /**
-   * When the service is created the services have to get loaded.
+   * When the serviceComponent is created the services have to get loaded.
    */
   created() {
     // if(this.$store.getters.getFiles == [])

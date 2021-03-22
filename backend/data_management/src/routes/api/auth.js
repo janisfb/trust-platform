@@ -6,9 +6,9 @@ const config = require("../../config/config");
 
 const Logger = new TrustLogger(
   "kafka:9092",
-  "data_management",
+  "auth_management",
   "logs",
-  "data_management"
+  "auth_management"
 );
 
 /**
@@ -17,10 +17,11 @@ const Logger = new TrustLogger(
  */
 module.exports = Router({ mergeParams: true })
   .post("/login", async (req, res, next) => {
+    console.log("--- login requested ---");
     try {
-      if (config.CONSOLE_LOGGING) console.log(req);
       const callback = (status, message) => {
-        if(status == 200) Logger.log(req, "Login", true, null, "user successfully logged in");
+        if (status == 200)
+          Logger.log(req, "Login", true, null, "user successfully logged in");
         res.status(status).send(message);
       };
       authController.loginUser(
@@ -35,5 +36,26 @@ module.exports = Router({ mergeParams: true })
         message: error.message,
       });
     }
-  }
-);
+  })
+  .post("/login?session_logout", async (req, res, next) => {
+    console.log("hey");
+    try {
+      if (config.CONSOLE_LOGGING) console.log(req);
+      const callback = (status, message) => {
+        if (status == 200)
+          Logger.log(req, "Login", true, null, "user successfully logged out");
+        res.status(status).send(message);
+      };
+      authController.logoutUser(
+        req.headers["x-consumer-username"],
+        req.headers["cookie"],
+        callback
+      );
+    } catch (error) {
+      Logger.log(req, "Login", false, null, "user logout failed");
+      res.status(error.statusCode || 500).json({
+        status: error.status,
+        message: error.message,
+      });
+    }
+  });

@@ -1,5 +1,6 @@
 const Service = require("../models/Service");
 const path = require("path");
+const mongoose = require("mongoose");
 const config = require("../config/config");
 
 /**
@@ -15,19 +16,22 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
     return;
   }
 
+  console.log("got sth:",reqBody)
+
   const newService = new Service({
-    company: reqBody.contact.company,
-    url: reqBody.contact.url,
-    email: reqBody.contact.email,
-    tel: reqBody.contact.tel,
-    name: reqBody.serviceMeta.name,
-    version: reqBody.serviceMeta.version,
-    description: reqBody.serviceMeta.description,
-    needsFullAccess: reqBody.sovereignty.needsFullAccess,
-    accessReason: reqBody.sovereignty.accessReason,
-    usesExternalService: reqBody.sovereignty.usesExternalService,
-    externalServiceName: reqBody.sovereignty.externalServiceName,
-    externalServiceReason: reqBody.sovereignty.externalServiceReason,
+    _id: new mongoose.mongo.ObjectID(),
+    company: reqBody.company,
+    url: reqBody.url,
+    email: reqBody.email,
+    tel: reqBody.tel,
+    name: reqBody.name,
+    version: reqBody.version,
+    description: reqBody.description,
+    needsFullAccess: reqBody.needsFullAccess,
+    accessReason: reqBody.accessReason,
+    usesExternalService: reqBody.usesExternalService,
+    externalServiceName: reqBody.externalServiceName,
+    externalServiceReason: reqBody.externalServiceReason,
   });
 
   newService

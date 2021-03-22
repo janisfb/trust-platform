@@ -25,12 +25,29 @@ module.exports = Router({ mergeParams: true })
       });
     }
   })
-  .get("/logs/prio", async (req, res, next) => {
+  .get("/logs/shared/:fileId", async (req, res, next) => {
     try {
       const callback = (status, message) => {
         res.status(status).send(message);
       };
-      logController.getPrioLogs(
+      logController.getSharedInstances(
+        req.headers["x-consumer-username"], 
+        req.params.fileId,
+        callback
+      );
+    } catch (error) {
+      res.status(error.statusCode || 500).json({
+        status: error.status,
+        message: error.message,
+      });
+    }
+  }) 
+  .get("/logs/filter", async (req, res, next) => {
+    try {
+      const callback = (status, message) => {
+        res.status(status).send(message);
+      };
+      logController.filterLogs(
         req.headers["x-consumer-username"], 
         req.query,
         callback

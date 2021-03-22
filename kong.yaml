@@ -8,6 +8,7 @@ services:
     paths:
     - /api/files
     - /api/login
+    - /api/login?session_logout
     strip_path: false
     methods: [ "GET", "POST", "DELETE" ]
   # - name: hello-world-tag

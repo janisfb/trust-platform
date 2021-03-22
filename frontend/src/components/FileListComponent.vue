@@ -129,7 +129,12 @@
               </b-tag>
             </div>
             <div class="buttons are-small">
-              <b-button icon-left="file-search">Souveränitätsdaten</b-button>
+              <b-button 
+                @click="searchLogsForFile(props.row.id)" 
+                icon-left="file-search"
+              >
+                Souveränitätsdaten
+              </b-button>
               <b-button 
                 @click="launchReplaceModal()"
                 icon-left="file-replace"
@@ -229,6 +234,12 @@ export default {
       required: true,
     },
   },
+  watch: {
+    onlyOwnFiles(newValue) {
+      console.log("newValue:", newValue);
+      this.retryFileFetch();
+    },
+  },
   computed: {
     /**
      * Returns the username.
@@ -283,9 +294,9 @@ export default {
             new Date(this.files[i].creationTime)
               .toLocaleString()
               .match(name_re) ||
-            this.files[i].id.match(name_re)) &&
-          (!this.onlyOwnFiles ||
-            (this.onlyOwnFiles && this.files[i].creator == this.username))
+            this.files[i].id.match(name_re)) // &&
+          //(!this.onlyOwnFiles ||
+          //  (this.onlyOwnFiles && this.files[i].creator == this.username))
         ) {
           dataFiltered.push(this.files[i]);
         }
@@ -353,7 +364,7 @@ export default {
      */
     retryFileFetch() {
       this.$store
-        .dispatch("getFiles")
+        .dispatch(this.onlyOwnFiles ? "getFiles" : "getAllFiles")
         .catch((error) => {
           this.fetchError = "Die Dateien konnten nicht geladen werden!";
           console.log(error);
@@ -367,6 +378,7 @@ export default {
      * @param {*} row - The row of the file.
      */
     confirmDelete(row) {
+      this.getSharedInstances(row.id);
       if(row.creator != this.username) {
         this.$buefy.dialog.confirm({
         title: "Datei löschen",
@@ -488,11 +500,51 @@ export default {
     onServiceSelected(selectedService) {
       this.selectedService = selectedService;
     },
+    /**
+     * Changes to the sovereignty tab and filters logs for that specific fileId.
+     * 
+     * @param {string} fileId - The fileId the logs should be filtered with.
+     */
+    searchLogsForFile(fileId) {
+      this.$router.push({ path: `/logs/filter/${fileId}` });
+    },
+    getSharedInstances(fileId) {
+      return new Promise((resolve, reject) => {
+        axios.get(`/api/logs/shared/${fileId}`)
+          .then((resp) => {   
+            console.log("hi",resp.data.logs) 
+            var sharedStr = "";
+            resp.data.logs.forEach(log => {
+              sharedStr += `<li>${log._source.time} - <a href="/logs/filter/${log._id}">${log._source.reason}</a></li>`;
+            }) 
+            if(resp.data.logs.length > 0) {
+              this.$buefy.dialog.alert({
+              title: 'Daten weitergegeben!',
+              type: 'is-danger',
+              message: `In mehreren Fällen wurden diese Daten weitergegeben!
+                Nach dem Löschen könnten also noch weitere Kopien existieren:
+                <ul>${sharedStr}</ul>`,
+              confirmText: 'Verstanden'
+            })
+            }
+            resolve();
+          })
+          .catch((err) => {
+            console.log("Something went wrong while executing a service.",err);
+            this.openFailedToast("Informationen konnten nicht geladen werden!");
+            reject(err);
+          });
+      });
+    },
   },
+  /**
+   * Will try to fetch the files on the created hook
+   * Fetches all files if switch for "onlyOwnFiles" false
+   */
   created() {
     // if(this.$store.getters.getFiles == [])
     this.$store
-      .dispatch("getFiles")
+      .dispatch(this.onlyOwnFiles ? "getFiles" : "getAllFiles")
       .catch((error) => {
         this.fetchError = "Die Dateien konnten nicht geladen werden!";
         console.log(error);
@@ -504,15 +556,6 @@ export default {
 <style lang="scss" scoped>
 .b-table .level:not(.top) {
   padding-bottom: 0rem;
-}
-
-.zoom {
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  &:hover {
-    transform: scale(1.07);
-  }
 }
 
 .text-align-left {

@@ -11,9 +11,9 @@ const app = express();
 
 const Logger = new TrustLogger(
   "kafka:9092",
-  "data_management",
+  "service_management",
   "logs",
-  "data_management"
+  "service_management"
 );
 
 app.use(

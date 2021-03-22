@@ -42,7 +42,7 @@ export default {
   },
   data() {
     return {
-      onlyOwnFiles: false,
+      onlyOwnFiles: true,
       showSearch: true,
     };
   },
