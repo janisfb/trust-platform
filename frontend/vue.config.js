@@ -1,6 +1,6 @@
 module.exports = {
   configureWebpack: {
-    devtool: 'source-map'
+    devtool: "source-map",
   },
   css: {
     loaderOptions: {
@@ -10,9 +10,14 @@ module.exports = {
     },
   },
   devServer: {
+    // should not be used in production
     proxy: {
       "^/api": {
         target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "^/logs-*": {
+        target: "http://localhost:9200",
         changeOrigin: true,
       },
     },

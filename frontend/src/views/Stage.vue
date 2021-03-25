@@ -25,6 +25,9 @@
             <b-navbar-item target="_blank" href="http://localhost:5601/">
               Kibana
             </b-navbar-item>
+            <b-navbar-item @click="confirmDeleteLogs()">
+              Logs löschen
+            </b-navbar-item>
         </b-navbar-dropdown>
       </template>
 
@@ -46,6 +49,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Stage",
   computed: {
@@ -76,6 +81,70 @@ export default {
         .dispatch("logout")
         .then(() => this.$router.push("/login"))
         .catch((error) => console.log(error));
+    },
+    /**
+     * Prompts for a confirm before deleting the logs.
+     */
+    confirmDeleteLogs() {
+      this.$buefy.dialog.confirm({
+        title: "Logs löschen",
+        message: `Mit dieser Aktion werden alle in Elasticsearch gespeicherten Log-Nachrichten gelöscht!
+          Wirklich fortfahren?`,
+        cancelText: "Abbrechen",
+        confirmText: "Logs löschen",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => this.deleteLogs()
+      });
+    },
+    /**
+     * Deletes all logs.
+     */
+    deleteLogs() {
+      return new Promise((resolve, reject) => {
+        axios.delete("/logs-*")
+          .then((resp) => {
+            console.log(resp);      
+            if(!resp.data.acknowledged)
+              throw new Error("Delete event was not acked!");      
+            this.openSuccessToast("Logs wurden erfolgreich gelöscht!");
+            this.$store.dispatch("getLogs");
+            resolve();
+          })
+          .catch((err) => {
+            console.log("Something went wrong while deleting the file!");
+            this.openFailedToast("Logs konnten nicht gelöscht werden!");
+            reject(err);
+          });
+      });
+    },
+    /**
+     * Opens error toast.
+     * 
+     * @param {string} message The message that should be shown.
+     */
+    openFailedToast(message) {
+      this.$buefy.toast.open({
+        duration: 4000,
+        message: message,
+        position: "is-bottom",
+        type: "is-danger",
+        queue: false,
+      });
+    },
+    /**
+     * Opens success toast.
+     * 
+     * @param {string} message The message that should be shown.
+     */
+    openSuccessToast(message) {
+      this.$buefy.toast.open({
+        duration: 4000,
+        message: message,
+        position: "is-top",
+        type: "is-success",
+        queue: false,
+      });
     },
   },
 };
