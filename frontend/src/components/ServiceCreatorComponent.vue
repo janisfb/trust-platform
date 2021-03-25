@@ -373,6 +373,9 @@ export default {
         });
       }
     },
+    /**
+     * Fills the upload fields with example values.
+     */
     async fillWithExampleValues() {
       const rand = this.randomName();
 

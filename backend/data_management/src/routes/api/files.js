@@ -13,9 +13,10 @@ const Logger = new TrustLogger(
 );
 
 /**
- * routes for file manipulation operations
- *  - /upload receive a single file and upload or overwrite it to the right directory
- *  - /delete delete a single file using either the name or the identifier
+ * routes for file retrieving and file manipulation operations
+ *  - get all files associated to the user
+ *  - receive a single file and upload or overwrite it to the right directory
+ *  - delete a single file using either the name or the identifier
  */
 module.exports = Router({ mergeParams: true })
   .post("/files", async (req, res, next) => {

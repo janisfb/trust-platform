@@ -53,6 +53,13 @@ exports.getUserLogs = function (reqUsername, resCallback) {
   );
 };
 
+/**
+ * Gets the log entries for the fileId that are associated with file sharing.
+ * 
+ * @param {string} reqUsername The username of the current user.
+ * @param {string} fileId The fileId of the file.
+ * @param {*} resCallback The callback for the Router containing the status and message.
+ */
 exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
   client.search(
     {
@@ -107,6 +114,13 @@ exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
   );
 }
 
+/**
+ * Allows filtering of logs.
+ * 
+ * @param {string} reqUsername The username of the current user.
+ * @param {*} reqQuery The query with the query parameters for the filters.
+ * @param {*} resCallback The callback for the Router containing the status and message.
+ */
 exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
   console.log(reqQuery.prios);
   if(!reqQuery || Object.keys(reqQuery).length === 0) {

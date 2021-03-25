@@ -4,9 +4,10 @@ const logController = require("../../controllers/logController");
 const config = require("../../config/config");
 
 /**
- * routes for file manipulation operations
- *  - /upload receive a single file and upload or overwrite it to the right directory
- *  - /delete delete a single file using either the name or the identifier
+ * routes for retrieval of logs
+ *  - /logs - gets all logs associated to the user
+ *  - /logs/shared/:fileId - gets all shared instances of the file
+ *  - /logs/filter/ - enables backend filtering for the logs
  */
 module.exports = Router({ mergeParams: true })
   .get("/logs", async (req, res, next) => {
