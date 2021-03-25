@@ -6,6 +6,9 @@
           <b-input
             placeholder="Suche nach Service, Anbieter oder Version"
             v-model.lazy="searchQuery"
+            icon-right="close-circle"
+            icon-right-clickable
+            @icon-right-click="clearSearchInput"
           />
         </b-field>
       </div>
@@ -223,6 +226,12 @@ export default {
           console.log(error);
         });
       this.fetchError = "";
+    },
+    /**
+     * Clears the searchQuery.
+     */
+    clearSearchInput() {
+      this.searchQuery = "";
     },
   },
   /**

@@ -79,6 +79,23 @@ db.services.save({
     "Die Dateien werden extern auf den Servern von file.io gespeichert..",
 });
 
+db.services.save({
+  _id: "605c9b7e6056510014550b9e",
+  company: "LocalService SE",
+  url: "example.com",
+  email: "info@example.com",
+  tel: "0123 4567890",
+  name: "LocalService",
+  version: "1.0.0",
+  description:
+    "Lokal ausgeführter Dienst, der die Länge des Textes (in Zeichen) zurückgibt.",
+  needsFullAccess: true,
+  accessReason: "Die Datei muss komplett eingelesen werden.",
+  usesExternalService: false,
+  externalServiceName: "Not Applicable",
+  externalServiceReason: "Not Applicable",
+});
+
 print(
   "End init #################################################################"
 );

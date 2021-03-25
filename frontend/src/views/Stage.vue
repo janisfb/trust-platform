@@ -40,6 +40,7 @@
 
     </b-navbar>
     
+    <!-- Show the content of the page -->
     <router-view />
   </div>
 </template>

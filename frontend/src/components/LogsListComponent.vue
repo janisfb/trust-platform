@@ -6,6 +6,9 @@
           <b-input
             placeholder="Suche nach Service, Anbieter oder Version"
             v-model.lazy="searchQuery"
+            icon-right="close-circle"
+            icon-right-clickable
+            @icon-right-click="clearSearchInput"
           />
         </b-field>
       </div>
@@ -163,7 +166,7 @@
           :width="40"          
         >
           <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
-            <div v-if="props.row._source.data_name != '-'" v-on:click="searchForFile(props.row._source.data_id)">
+            <div v-if="props.row._source.data_name != '-'" v-on:click="searchFor(props.row._source.data_id)">
               <b-tooltip
                 multilined
                 type="is-light"
@@ -172,7 +175,7 @@
                 <b-icon class="zoom" icon="file-search-outline"></b-icon>
               </b-tooltip>
             </div>
-            <div v-on:click="searchForSession(props.row._source.session)">
+            <div v-on:click="searchFor(props.row._source.session)">
               <b-tooltip
                 multilined
                 type="is-light"
@@ -362,16 +365,26 @@ export default {
     /**
      * Closes the other detail view by setting the
      * 'opened' variable to the current row.
+     * 
+     * @param {*} row - The row that should be closed. 
      */
     closeOtherDetail(row) {
       this.defaultOpenedDetails = [row._id];
     },
-    searchForFile(fileId) {
-      this.searchQuery = fileId;
+    /**
+     * Searches the logs for a given string.
+     * 
+     * @param {string} searchQuery - The search string.
+     */
+    searchFor(searchQuery) {
+      this.searchQuery = searchQuery;
     },
-    searchForSession(sessionId) {
-      this.searchQuery = sessionId;
-    }
+    /**
+     * Clears the searchQuery.
+     */
+    clearSearchInput() {
+      this.searchQuery = "";
+    },
   },
   /**
    * When the logsComponent is created the logs have to get loaded.

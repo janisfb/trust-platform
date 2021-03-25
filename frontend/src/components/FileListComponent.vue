@@ -4,6 +4,9 @@
       <b-input
         placeholder="Suche nach Dateiname, Besitzer, ID oder Datum"
         v-model.lazy="searchQuery"
+        icon-right="close-circle"
+        icon-right-clickable
+        @icon-right-click="clearSearchInput"
       />
     </b-field>
     <div v-if="this.fetchError != ''">
@@ -535,6 +538,12 @@ export default {
             reject(err);
           });
       });
+    },
+    /**
+     * Clears the searchQuery.
+     */
+    clearSearchInput() {
+      this.searchQuery = "";
     },
   },
   /**
