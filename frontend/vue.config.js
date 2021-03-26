@@ -18,7 +18,7 @@ module.exports = {
       },
       "^/delete-logs": {
         pathRewrite: {
-          "^/delete-logs": "/logs-*", // rewrite path
+          "^/delete-logs": "/logs-*", // rewrite path because /logs hat route on vue-router
         },
         target: "http://localhost:9200/",
         changeOrigin: true,

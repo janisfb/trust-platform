@@ -515,7 +515,6 @@ export default {
       return new Promise((resolve, reject) => {
         axios.get(`/api/logs/shared/${fileId}`)
           .then((resp) => {   
-            console.log("hi",resp.data.logs) 
             var sharedStr = "";
             resp.data.logs.forEach(log => {
               sharedStr += `<li>${new Date(log._source.time).toLocaleString()} - <a href="/logs/filter/${log._id}">${log._source.reason}</a></li>`;

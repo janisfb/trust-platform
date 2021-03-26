@@ -4,7 +4,7 @@
       <div class="column">
         <b-field>
           <b-input
-            placeholder="Suche nach Service, Anbieter oder Version"
+            placeholder="Suche nach Nutzer, Kategorie, Aktion, Datei usw."
             v-model.lazy="searchQuery"
             icon-right="close-circle"
             icon-right-clickable
@@ -134,7 +134,7 @@
           label="Aktion"
           v-slot="props"
         >
-          <div class="ta" v-bind:class="formatByPriority(props.row)">
+          <div class="ta ta-truncate-reason" v-bind:class="formatByPriority(props.row)">
             {{ props.row._source.reason }}
           </div>
         </b-table-column>
@@ -144,7 +144,7 @@
           label="Datei"
           v-slot="props"
         >
-          <div class="ta ta-truncate" v-bind:class="formatByPriority(props.row)">            
+          <div class="ta ta-truncate-file" v-bind:class="formatByPriority(props.row)">            
             {{ props.row._source.data_name }}
           </div>
         </b-table-column>
@@ -190,50 +190,38 @@
         <template #detail="props">
           <div class="level">
             <div class="level-left">
-              <h1>ID: {{ props.row.id }}</h1>
               <b-tag
                 class="ml-5"
-                v-if="props.row.creator != username"
+                v-if="!props.row._source.status"
                 type="is-warning"
                 Colored
                 tag
                 label
               >
-                Keine eigene Datei
+                Fehlschlag
               </b-tag>
+              <b-tag
+                class="ml-5"
+                v-else
+                type="is-success"
+                Colored
+                tag
+                label
+              >
+                Erfolgreich
+              </b-tag>
+              <b class="p-1">|</b>
+              <h1><b>Dienst:</b> {{ props.row._source.source_name }}</h1>
+              <b class="p-1">|</b>
+              <h1><b>Log-ID:</b> {{ props.row._id }}</h1>
+              <b class="p-1">|</b>
+              <h1><b>Nutzer-IP:</b> {{ props.row._source.user_ip }}</h1>
+              <b class="p-1">|</b>
+              <h1><b>Dienst-IP:</b> {{ props.row._source.source_ip }}</h1> 
+              <b class="p-1">|</b>
+              <h1><b>Session-ID:</b> {{ props.row._source.session }}</h1>          
             </div>
-            <div class="buttons are-small">
-              <b-button icon-left="file-search">Souveränitätsdaten</b-button>
-              <b-button 
-                @click="launchReplaceModal()"
-                icon-left="file-replace"
-              >
-                Datei ersetzen
-              </b-button>
-              <b-button 
-                @click="confirmDelete(props.row)"
-                class="is-danger" 
-                icon-left="delete"
-              >
-                Datei löschen
-              </b-button
-              >
-            </div>
-          </div>
-          <b-modal v-model="isReplaceModalActive" :width="400">
-              <div class="box" style="padding: 0px">
-                <section class="hero is-light">
-                  <div class="hero-body">
-                    <h1 class="title">Datei ersetzen</h1>
-                    <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
-                  </div>
-                </section>
-                <section style="padding: 1.5rem; padding-left: 3em;">
-                  <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
-                  <file-upload-component :replaceId="props.row.id"></file-upload-component>
-                </section>
-              </div>
-            </b-modal>
+          </div>          
         </template>  
       </b-table>
     </div>
@@ -411,6 +399,30 @@ export default {
   padding-bottom: 0rem;
 }
 
+@mixin ta-truncate {
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  overflow: hidden; 
+
+  &:hover {
+    text-overflow:clip;
+    width:auto;
+    white-space: normal;
+  }
+}
+
+.ta-truncate-file {
+  @include ta-truncate;
+
+  max-width: 250px;
+}
+
+.ta-truncate-reason {
+  @include ta-truncate;
+
+  max-width: 300px;
+}
+
 .zoom {
   cursor: pointer;
   transition: all 0.25s ease;
@@ -422,13 +434,6 @@ export default {
 
 .ta {
   text-align: left;
-}
-
-.ta-truncate {
-  max-width: 250px;
-  white-space: nowrap; 
-  text-overflow: ellipsis; 
-  overflow: hidden; 
 }
 
 .list-border-right {

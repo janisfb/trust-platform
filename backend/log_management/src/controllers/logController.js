@@ -57,10 +57,10 @@ exports.getUserLogs = function (reqUsername, resCallback) {
  * Gets the log entries for the fileId that are associated with file sharing.
  * 
  * @param {string} reqUsername The username of the current user.
- * @param {string} fileId The fileId of the file.
+ * @param {string} dataId The fileId of the file.
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
-exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
+exports.getSharedInstances = function (reqUsername, dataId, resCallback) {
   client.search(
     {
       index: "logs-*",
@@ -84,7 +84,7 @@ exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
               },
               {
                 term: {
-                  data_id: fileId,
+                  data_id: dataId,
                 },
               },
             ],
@@ -112,7 +112,7 @@ exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
       resCallback(200, response);
     }
   );
-}
+};
 
 /**
  * Allows filtering of logs.
@@ -122,9 +122,11 @@ exports.getSharedInstances = function(reqUsername, fileId, resCallback) {
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
 exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
-  console.log(reqQuery.prios);
   if(!reqQuery || Object.keys(reqQuery).length === 0) {
-    resCallback(404, "Request contained no queries for filtering. Possible queries: prios, categories.");
+    resCallback(
+      404,
+      "Request contained no queries for filtering. Possible queries: prios, categories, dataId."
+    );
     return;
   }
 
@@ -132,19 +134,65 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
   if (reqQuery.prios != undefined) {
     prios = reqQuery.prios.split(",");
   }
+
+  var queries = [];
+  queries.push({
+    terms: {
+      priority: prios,
+    },
+  });
   
-  var categories = [
-    "login",
-    "create",
-    "store",
-    "change",
-    "archive",
-    "use",
-    "share",
-    "destroy",
-  ];
   if (reqQuery.categories != undefined) {
     categories = reqQuery.categories.split(",");
+    queries.push({
+      terms: {
+        category: categories,
+      },
+    });
+  }
+
+  if (reqQuery.dataId != undefined) {
+    queries.push({
+      term: {
+        data_id: reqQuery.dataId,
+      },
+    });
+  }
+ 
+  if (reqQuery.dataName != undefined) {
+    queries.push({
+      query_string:{  
+         default_field:"data_name",
+         query:`*${reqQuery.dataName}*`
+      },
+    });
+  }
+
+  if (reqQuery.session != undefined) {
+    queries.push({
+      query_string: {
+        default_field: "session",
+        query: `${reqQuery.session.replace("{", "").replace("}", "")}`,
+      },
+    });
+  }
+
+  if (reqQuery.user != undefined) {
+    queries.push({
+      query_string: {
+        default_field: "user_name",
+        query: `*${reqQuery.user}*`,
+      },
+    });
+  }
+
+  if (reqQuery.user_ip != undefined) {
+    queries.push({
+      query_string: {
+        default_field: "user_ip",
+        query: `${reqQuery.user_ip.replace("{", "").replace("}", "")}`,
+      },
+    });
   }
 
   client.search(
@@ -162,17 +210,8 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
               },
             },
             must: [
-              {
-                terms: {
-                  priority: prios,
-                }
-              },
-              {
-                terms: {
-                  category: categories,
-                }           
-              }
-            ]            
+              queries,
+            ],
           },
         },
       },
