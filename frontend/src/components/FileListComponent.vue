@@ -518,7 +518,7 @@ export default {
             console.log("hi",resp.data.logs) 
             var sharedStr = "";
             resp.data.logs.forEach(log => {
-              sharedStr += `<li>${log._source.time} - <a href="/logs/filter/${log._id}">${log._source.reason}</a></li>`;
+              sharedStr += `<li>${new Date(log._source.time).toLocaleString()} - <a href="/logs/filter/${log._id}">${log._source.reason}</a></li>`;
             }) 
             if(resp.data.logs.length > 0) {
               this.$buefy.dialog.alert({

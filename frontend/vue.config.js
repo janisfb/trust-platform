@@ -16,8 +16,11 @@ module.exports = {
         target: "http://localhost:8000",
         changeOrigin: true,
       },
-      "^/logs-*": {
-        target: "http://localhost:9200",
+      "^/delete-logs": {
+        pathRewrite: {
+          "^/delete-logs": "/logs-*", // rewrite path
+        },
+        target: "http://localhost:9200/",
         changeOrigin: true,
       },
     },

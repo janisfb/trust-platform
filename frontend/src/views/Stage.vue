@@ -102,7 +102,7 @@ export default {
      */
     deleteLogs() {
       return new Promise((resolve, reject) => {
-        axios.delete("/logs-*")
+        axios.delete("/delete-logs")
           .then((resp) => {
             console.log(resp);      
             if(!resp.data.acknowledged)

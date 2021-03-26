@@ -29,7 +29,7 @@ module.exports = Router({ mergeParams: true })
             id: message.file.id,
             name: message.file.fileName,
           };
-          Logger.log(req, "Store", true, data, "");
+          Logger.log(req, "Store", true, data, "data was uploaded");
         } else {
           Logger.log(req, "Store", false, null, `upload failed: ${message}`);
         }
