@@ -164,7 +164,7 @@
                 </section>
                 <section style="padding: 1.5rem; padding-left: 3em;">
                   <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
-                  <file-upload-component :replaceId="props.row.id"></file-upload-component>
+                  <file-upload-component :replaceId="props.row.id" :only-own-files="onlyOwnFiles"></file-upload-component>
                 </section>
               </div>
             </b-modal>
@@ -417,7 +417,7 @@ export default {
           .then((resp) => {
             console.log(resp);            
             this.openSuccessToast("Die Datei wurde erfolgreich gelöscht!");
-            this.$store.dispatch("getFiles");
+            this.$store.dispatch(this.onlyOwnFiles ? "getFiles" : "getAllFiles");
             resolve();
           })
           .catch((err) => {

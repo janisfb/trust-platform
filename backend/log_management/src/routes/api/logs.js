@@ -24,7 +24,7 @@ var infoObject = {
   },
   paths: [
     {
-      "/logs": {
+      "/api/logs": {
         get: {
           description: "The endpoint you have just visited.",
           reponses: {
@@ -38,7 +38,7 @@ var infoObject = {
           },
         },
       },
-      "/logs/shared/": {
+      "api/logs/shared/": {
         get: {
           description:
             "Endpoint for logs that document a sharing of the file with the ID dataId.",
@@ -62,7 +62,7 @@ var infoObject = {
           },
         },
       },
-      "/logs/filter": {
+      "api/logs/filter": {
         get: {
           description: "Endpoint for backend filtering of the logs.",
           parameters: [

@@ -60,7 +60,7 @@ module.exports = Router({ mergeParams: true })
           );
           Logger.log(
             req,
-            "Use",
+            "view",
             true,
             data,
             "file information requested by user"
@@ -68,7 +68,7 @@ module.exports = Router({ mergeParams: true })
         } else {
           Logger.log(
             req,
-            "Use",
+            "view",
             false,
             null,
             `could not get user files: ${message}`
@@ -79,7 +79,7 @@ module.exports = Router({ mergeParams: true })
       };
       fileController.getUserFiles(req.headers["x-consumer-username"], false, callback);
     } catch (error) {
-      Logger.log(req, "Change", false, null, "could not get user files");
+      Logger.log(req, "view", false, null, "could not get user files");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
@@ -97,7 +97,7 @@ module.exports = Router({ mergeParams: true })
           );
           Logger.log(
             req,
-            "Use",
+            "view",
             true,
             data,
             "file information requested by user"
@@ -105,7 +105,7 @@ module.exports = Router({ mergeParams: true })
         } else {
           Logger.log(
             req,
-            "Use",
+            "view",
             false,
             null,
             `could not get user files: ${message}`
@@ -116,7 +116,7 @@ module.exports = Router({ mergeParams: true })
       };
       fileController.getUserFiles(req.headers["x-consumer-username"], true, callback);
     } catch (error) {
-      Logger.log(req, "Change", false, null, "could not get user files");
+      Logger.log(req, "view", false, null, "could not get user files");
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,

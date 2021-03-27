@@ -106,7 +106,7 @@ exports.getSharedInstances = function (reqUsername, dataId, resCallback) {
 
       if (config.CONSOLE_LOGGING)
         console.log(
-          `fetched ${result.body.hits.total} logs of data sharing for user ${reqUsername} and file id ${fileId}!`
+          `fetched ${result.body.hits.total} logs of data sharing for user ${reqUsername} and file id ${dataId}!`
         );
 
       resCallback(200, response);

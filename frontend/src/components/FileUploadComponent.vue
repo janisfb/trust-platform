@@ -59,7 +59,14 @@ export default {
       type: String,
       default: "",
       required: false,
-    }
+    },
+    /**
+     * If only files created by the current user should be shown.
+     */
+    onlyOwnFiles: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     /**
@@ -93,7 +100,7 @@ export default {
             this.file = null;
             this.errorText = "";
             this.openSuccessToast("Datei erfolgreich hochgeladen!");
-            this.$store.dispatch("getFiles");
+            this.$store.dispatch(this.onlyOwnFiles ? "getFiles" : "getAllFiles");
             resolve();
           })
           .catch((err) => {
@@ -124,7 +131,7 @@ export default {
             this.file = null;
             this.errorText = "";
             this.openSuccessToast("Datei erfolgreich geändert!");
-            this.$store.dispatch("getFiles");
+            this.$store.dispatch(this.onlyOwnFiles ? "getFiles" : "getAllFiles");
             resolve();
           })
           .catch((err) => {

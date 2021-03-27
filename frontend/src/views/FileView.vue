@@ -4,7 +4,7 @@
       <div class="columns">
         <div class="column is-narrow">
           <div class="box fill-height" style="width: 15vw;">
-            <file-upload-component></file-upload-component>
+            <file-upload-component :only-own-files="onlyOwnFiles"></file-upload-component>
             <section>
               <hr />
               <div class="control pl-4" style="text-align: left;">
