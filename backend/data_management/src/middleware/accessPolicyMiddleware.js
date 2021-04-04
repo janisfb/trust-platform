@@ -10,15 +10,18 @@ module.exports = {
         next();
       } else {
         var files = glob.sync(
-          `${config.FILE_UPLOAD_DIRECTORY}/*-${req.params.fileId}-*`
+          `${config.UPLOAD_DIRECTORY}/*-${req.params.id}-*`
         );
+
+        let fileUploadPath;
+        console.log(files);
 
         if (files.length > 0) {
           fileUploadPath = files[0];
         }
 
         if (files.length > 1 || !fs.existsSync(fileUploadPath)) {
-          console.log(`No distinctive file found for ${fileId}.`);
+          console.log(`No distinctive file found for ${req.params.id}.`);
           var notFoundErr = new Error(
             "You don't have access to this ressource."
           );
@@ -35,7 +38,7 @@ module.exports = {
             "You shall not pass! No access for",
             username,
             "on ressource",
-            req.params.fileId
+            req.params.id
           );
           var noAccessErr = new Error(
             "You don't have access to this ressource."
