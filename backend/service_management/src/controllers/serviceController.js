@@ -16,8 +16,6 @@ exports.createService = function (reqBody, reqFiles, resCallback) {
     return;
   }
 
-  console.log("got sth:",reqBody)
-
   const newService = new Service({
     _id: new mongoose.mongo.ObjectID(),
     company: reqBody.company,

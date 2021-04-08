@@ -18,5 +18,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(config.PORT, () => {
-  console.log(`⚡️[server]: Server is running at localhost:${config.PORT}`);
+  console.log(`⚡️[log_management]: Server is running at localhost:${config.PORT}`);
 });

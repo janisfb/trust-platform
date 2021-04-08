@@ -44,6 +44,15 @@ services:
     strip_path: false
     methods: [ "GET" ]
 
+- name: proof_management
+  url: http://host.docker.internal:6003
+  routes:
+  - name: proof_management
+    paths:
+    - /api/proofs
+    strip_path: false
+    methods: [ "GET", "POST", "DELETE" ]
+
 plugins:
 - name: basic-auth
   config: 

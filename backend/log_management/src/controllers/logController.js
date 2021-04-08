@@ -33,7 +33,7 @@ exports.getUserLogs = function (reqUsername, resCallback) {
     },
     (err, result) => {
       if (err) {
-        console.log("Error while fetching files.");
+        console.log("Error while fetching logs from elasticsearch.");
         resCallback(500, err);
         return;
       }
@@ -94,7 +94,7 @@ exports.getSharedInstances = function (reqUsername, dataId, resCallback) {
     },
     (err, result) => {
       if (err) {
-        console.log("Error while fetching files.");
+        console.log("Error while fetching logs from elasticsearch.");
         resCallback(500, err);
         return;
       }

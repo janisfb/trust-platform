@@ -37,6 +37,16 @@ services:
     ports:
       - 6002:6002
 
+  # Manages the proof api 
+  proof_management:
+    build:
+      context: ./backend/proof_management/
+      target: debug #debug mode with nodemon running!
+    volumes:
+      - ./backend/proof_management/src/:/work/src/
+    ports:
+      - 6003:6003
+
   # Stores metadata of the exposed microservices
   service_db:
     image: mongo:latest
