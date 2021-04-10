@@ -15,7 +15,7 @@ module.exports = Router({ mergeParams: true })
       const callback = (status, message) => {
         res.status(status).send(message);
       };
-      proofGenerationController.getProofs(callback);
+      proofGenerationController.getBlocks(callback);
     } catch (error) {
       res.status(error.statusCode || 500).json({
         status: error.status,

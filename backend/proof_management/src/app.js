@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+var CronJob = require("cron").CronJob;
 
 const router = require("./routes/createRouter")();
 const config = require("./config/config");
@@ -16,6 +17,22 @@ mongoose
   .catch((err) =>
     console.log("error while establishing connection to mongo db", err)
   );
+
+// every minute
+var blockGenJob = new CronJob(
+  "* * * * *",
+  function () {
+    var endTime = new Date;
+    var startTime = new Date(endTime);
+    startTime.setMinutes(endTime.getMinutes() - 1);
+
+    console.log(startTime, ", ", endTime);
+  },
+  function () {
+    console.log("cron job completed");
+  }
+);
+// blockGenJob.start();
 
 app.use("/api", router);
 

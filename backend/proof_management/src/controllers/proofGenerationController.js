@@ -58,7 +58,7 @@ class internalBlock {
  * 
  * @param {*} resCallback - The callback for the response.
  */
-exports.getProofs = function(resCallback) {
+exports.getBlocks = function(resCallback) {
   Block.find({}, function (err, blocks) {
     if (err) {
       console.log("Error while fetching blocks from db:", err);
@@ -199,7 +199,7 @@ const getLogs = (startTime, endTime, callback) => {
  * @param {*} hashCallback - The callback from the function.
  */
 const getPrevHash = (hashCallback) => {
-  Block.findOne({}, {}, { sort: { 'created_at':-1 } }, function(err, prevBlock) {
+  Block.findOne({}, {}, { sort: { "created_at":-1 } }, function(err, prevBlock) {
     if (err) {
       console.log("error while fetching prev block:", err);
       return "error while fetching prev block";
