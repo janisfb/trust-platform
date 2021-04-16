@@ -33,7 +33,6 @@ module.exports = Router({ mergeParams: true })
         };
         console.log(req.query);
         proofGenerationController.generateProof(
-          req.query.startTime,
           req.query.endTime,
           callback
         );

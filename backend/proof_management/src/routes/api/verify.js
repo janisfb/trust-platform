@@ -26,7 +26,7 @@ module.exports = Router({ mergeParams: true })
       const callback = (status, message) => {
         res.status(status).send(message);
       };
-      proofVerificationController.verfiyChain(callback);
+      proofVerificationController.verifyChain(callback);
     } catch (error) {
       res.status(error.statusCode || 500).json({
         status: error.status,

@@ -4,6 +4,7 @@ var CronJob = require("cron").CronJob;
 
 const router = require("./routes/createRouter")();
 const config = require("./config/config");
+const proofGenerationController = require("./controllers/proofGenerationController");
 
 const app = express();
 
@@ -18,21 +19,33 @@ mongoose
     console.log("error while establishing connection to mongo db", err)
   );
 
-// every minute
+// every fifth minute
 var blockGenJob = new CronJob(
-  "* * * * *",
+  "*/5 * * * *",
   function () {
-    var endTime = new Date;
-    var startTime = new Date(endTime);
-    startTime.setMinutes(endTime.getMinutes() - 1);
-
-    console.log(startTime, ", ", endTime);
+    var endTime = new Date().toISOString();
+    const callback = (status, message) => {
+      if(status == 200) {
+        console.log(
+          "-- [CRONJOB] New block created --\n",
+          message,
+          "\n---------------------------------"
+        );
+      } else {
+        console.log(
+          "-------- [CRONJOB] failed -------\n",
+          message,
+          "\n---------------------------------"
+        );
+      }
+    };
+    proofGenerationController.generateProof(endTime, callback);
   },
   function () {
     console.log("cron job completed");
   }
 );
-// blockGenJob.start();
+blockGenJob.start();
 
 app.use("/api", router);
 

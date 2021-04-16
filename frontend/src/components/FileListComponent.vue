@@ -155,19 +155,19 @@
             </div>
           </div>
           <b-modal v-model="isReplaceModalActive" :width="400">
-              <div class="box" style="padding: 0px">
-                <section class="hero is-light">
-                  <div class="hero-body">
-                    <h1 class="title">Datei ersetzen</h1>
-                    <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
-                  </div>
-                </section>
-                <section style="padding: 1.5rem; padding-left: 3em;">
-                  <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
-                  <file-upload-component :replaceId="props.row.id" :only-own-files="onlyOwnFiles"></file-upload-component>
-                </section>
-              </div>
-            </b-modal>
+            <div class="box" style="padding: 0px">
+              <section class="hero is-light">
+                <div class="hero-body">
+                  <h1 class="title">Datei ersetzen</h1>
+                  <h2 class="subtitle">{{ props.row.fileName }} [{{props.row.id}}]</h2>
+                </div>
+              </section>
+              <section style="padding: 1.5rem; padding-left: 3em;">
+                <div v-if="props.row.creator != username" class="has-text-danger pb-2">Dies ist keine eigene Datei!</div>
+                <file-upload-component :replaceId="props.row.id" :only-own-files="onlyOwnFiles"></file-upload-component>
+              </section>
+            </div>
+          </b-modal>
         </template>  
       </b-table>
       <b-modal v-model="isResultModalActive" :width="800">

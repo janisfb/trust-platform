@@ -14,7 +14,7 @@ const Block = require("../models/Block");
  * 
  * @param {*} resCallback - The callback for the response.
  */
-exports.verfiyChain = function(resCallback) {
+exports.verifyChain = function(resCallback) {
   Block.find({}, function (err, blocks) {
     if (err) {
       console.log("Error while fetching blocks from db:", err);
@@ -90,6 +90,13 @@ function calculateHash(block) {
  * @param {*} resCallback - The callback for the reponse.
  */
 exports.verifyLog = function(logId, resCallback) {
+  const chainVerificationCallback = (status, message) => {
+    if(status != 200) {
+      resCallback(status, message);
+      return;
+    }
+  };
+  this.verifyChain(chainVerificationCallback);
   // 0. check if chain is still valid
   // 1. get the log
   // 2. find the corresponding block
@@ -110,6 +117,7 @@ exports.verifyLog = function(logId, resCallback) {
       if (block == null) {
         console.log("No block! Log possibly invalid or not proofed yet.");
         const response = {
+          valid: false,
           status: "Unknown",
           message: `No block found for log with ID ${logId}. The log should be treated as invalid. You can recheck for a corresponding block later.`,
         };
@@ -127,6 +135,8 @@ exports.verifyLog = function(logId, resCallback) {
 
       if(contained) {
         const response = {
+          valid: true,
+          block: block,
           status: "Valid",
           message: `The log with ID ${logId} was found in block #${block.hash}!`,
         };
@@ -134,6 +144,8 @@ exports.verifyLog = function(logId, resCallback) {
         resCallback(200, response);
       } else {
         const response = {
+          valid: false,
+          block, block,
           status: "Invalid",
           message: `The log with ID ${logID} was not found in the corresponding block #${block.hash}! The log is invalid!`,
         };

@@ -61,7 +61,7 @@
         </b-checkbox-button>
       </b-field>
     </div>
-    <h1 class="pt-5" v-if="data.length == 0">Keine Services verfügbar!</h1>
+    <h1 class="pt-5" v-if="logs.length == 0">Keine Logs verfügbar!</h1>
     <div v-else class="container">
       <b-table
         hoverable
@@ -184,6 +184,15 @@
                 <b-icon class="zoom" icon="layers-search-outline"></b-icon>
               </b-tooltip>
             </div>
+            <div v-on:click="validateLog(props.row._id)">
+              <b-tooltip
+                multilined
+                type="is-light"
+                label="Diesen Eintrag validieren."
+              >
+                <b-icon class="zoom" icon="link-lock"></b-icon>
+              </b-tooltip>
+            </div>
           </div>
         </b-table-column>
 
@@ -221,22 +230,34 @@
               <b class="p-1">|</b>
               <h1><b>Session-ID:</b> {{ props.row._source.session }}</h1>          
             </div>
-          </div>          
-        </template>  
+          </div>            
+        </template>   
+
+        <b-modal v-model="isValidationModalActive" :width="600">
+          <div class="box" style="padding: 0px">
+            <section class="hero is-light">
+              <div class="hero-body">
+                <h1 class="title">Validierung</h1>
+              </div>
+            </section>
+            <section style="padding: 1.5rem; padding-left: 3em;">
+              <p>{{ validationResult }}</p>
+            </section>
+          </div> 
+        </b-modal>
       </b-table>
     </div>
   </section>
 </template>
 
 <script>
-const data = require("@/data/logs.json");
+import axios from "axios";
 
 export default {
   name: "ServiceExplorer",
   data() {
     return {
       // table data + settings
-      data,
       paginationPosition: "bottom",
       currentPage: 1,
       defaultOpenedDetails: [],
@@ -250,6 +271,9 @@ export default {
 
       // fetchError text when fetch of logs failed
       fetchError: "",
+
+      isValidationModalActive: false,
+      validationResult: null,
     };
   },
   components: {
@@ -372,6 +396,48 @@ export default {
      */
     clearSearchInput() {
       this.searchQuery = "";
+    },
+    /**
+     * Launches the validation modal.
+     */
+    launchValidationModal() {
+      this.isValidationModalActive = true;
+    },
+    /**
+     * Performs the execution of the service.
+     * 
+     * @param {String} serviceId - The id of the service that should be executed.
+     * @param {String} fileId - The id of the file that the service should be executed with.
+     */
+    validateLog(logId) {
+      this.validationResult = null;
+      return new Promise((resolve, reject) => {
+        axios.get(`/api/proofs/verify/${logId}`)
+          .then((resp) => {
+            this.validationResult = `Dieser Log konnte ${resp.data.valid ? "erfolgreich validiert werden!" : "nicht validiert werden!"}`;         
+            this.launchValidationModal();
+            resolve();
+          })
+          .catch((err) => {
+            console.log("Something went wrong while validating the log.");
+            this.openFailedToast("Die Validierung konnte nicht durchgeführt werden!");
+            reject(err);
+          });
+      });
+    },
+    /**
+     * Opens error toast.
+     * 
+     * @param {string} message The message that should be shown.
+     */
+    openFailedToast(message) {
+      this.$buefy.toast.open({
+        duration: 4000,
+        message: message,
+        position: "is-bottom",
+        type: "is-danger",
+        queue: false,
+      });
     },
   },
   /**

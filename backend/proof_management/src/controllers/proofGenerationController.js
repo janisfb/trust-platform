@@ -12,7 +12,7 @@ const Block = require("../models/Block");
  * This class is used to actually mine the block.
  */
 class internalBlock {
-  constructor(timestamp, data, prevHash = "", diff = 5) {
+  constructor(timestamp, data, prevHash = "", diff = 1) {
     this.timestamp = timestamp;
     this.data = data;
     this.prevHash = prevHash;
@@ -89,30 +89,28 @@ exports.deleteAll = function(resCallback) {
 /**
  * Creates a block with a bloom filter containing proof of the logs in a specific timeframe.
  * 
- * @param {*} startTime - The startTime for logs that should be contained in the blocks bloom filter.
  * @param {*} endTime - The endTime for logs that should be contained in the blocks bloom filter.
  * @param {*} resCallback - The callback for the response.
  */
-exports.generateProof = function (startTime, endTime, resCallback) {
+exports.generateProof = function (endTime, resCallback) {
   if (
-    !startTime ||
     !endTime ||
-    Object.keys(startTime).length === 0 ||
     Object.keys(endTime).length === 0
   ) {
-    console.log("No start/end time was added to the request.");
-    resCallback(400, "No start/end time was added to the request.");
+    console.log("No end time was added to the request.");
+    resCallback(400, "No end time was added to the request.");
     return;
   }
 
-  if( startTime >= endTime ) {
-    console.log(`Start time of ${startTime} is not before ${endTime}!`);
-    resCallback(400, "Start time must be before end time!");
-    return;
-  }
+  // callback for getPrevBlock()
+  const callback = (prevBlock) => {
+    var prevEndTime = new Date(prevBlock.data.endTime).toISOString();
 
-  const callback = (prevHash) => {
-    console.log("prevHash:", prevHash);
+    if (prevEndTime >= endTime) {
+      console.log(`Start time of ${prevEndTime} (end time of prev block) is not before ${endTime}!`);
+      resCallback(400, "End time must be after start time!");
+      return;
+    }
     // 3. create new block
     //  - get logs of [startTime, endTime] from elasticsearch
     //  - push logs into bloomfilter
@@ -123,7 +121,7 @@ exports.generateProof = function (startTime, endTime, resCallback) {
       var bloomJSON = JSON.stringify(bloom.saveAsJSON());
 
       var data = {
-        startTime: startTime,
+        startTime: prevEndTime,
         endTime: endTime,
         bloom: bloomJSON,
       };
@@ -131,19 +129,19 @@ exports.generateProof = function (startTime, endTime, resCallback) {
       var newInternalBlock = new internalBlock(
         new Date().toISOString(),
         data,
-        prevHash
+        prevBlock.hash
       );
 
       var newBlock = saveBlock(newInternalBlock);
-      resCallback(200, newBlock);
+      resCallback(200, newInternalBlock);
     }
 
-    getLogs(startTime, endTime, logsCallback);
+    getLogs(prevEndTime, endTime, logsCallback);
   };
 
   // 1. try to get prev block
   // 2. if no prev block exists create genesis block
-  getPrevHash(callback);
+  getPrevBlock(callback);
 };
 
 /**
@@ -193,28 +191,23 @@ const getLogs = (startTime, endTime, callback) => {
 }
 
 /**
- * Gets the hash from the previous block in the chain.
+ * Gets the previous block in the chain.
  * If chain is empty a new genesis block is created.
  * 
- * @param {*} hashCallback - The callback from the function.
+ * @param {*} callback - The callback from the function.
  */
-const getPrevHash = (hashCallback) => {
-  Block.findOne({}, {}, { sort: { "created_at":-1 } }, function(err, prevBlock) {
-    if (err) {
-      console.log("error while fetching prev block:", err);
-      return "error while fetching prev block";
-    }
-
-    if (prevBlock == null) {
-      console.log("No prev block! Creating new genesis block.")
+const getPrevBlock = (callback) => {
+  Block.find({}).sort({_id: -1}).limit(1).then((prevBlock) => {
+    if (!prevBlock || prevBlock == null || prevBlock.length == 0) {
+      console.log("No prev block! Creating new genesis block.");
       createGenesisBlock();
       // wait for creation of genesis block before recursive call
       return setTimeout(() => {
-        getPrevHash(hashCallback);
+        getPrevBlock(callback);
       }, 1000);
     }
 
-    hashCallback(prevBlock.hash);
+    callback(prevBlock[0]);
   })
 }
 
@@ -222,7 +215,8 @@ const getPrevHash = (hashCallback) => {
  * Creates a new genesis block for the chain.
  */
 const createGenesisBlock = () => {
-  var time = new Date().toISOString();
+  //end time of genesis block should be before any of the logs were created
+  var time = new Date("2021-01-01T15:30:00.000Z").toISOString();
   var data = {
     startTime: time,
     endTime: time,
@@ -253,7 +247,6 @@ function saveBlock(internalBlock) {
 
   newBlock.save()
     .then((newBlock) => {
-      console.log("added new block to chain:", newBlock);
       return newBlock;
     });
 }
