@@ -7,12 +7,24 @@ const TrustLogger = require("trust-logger-ba");
 
 const config = require("../../config/config");
 
-const Logger = new TrustLogger(
-  "kafka:9092",
-  "service_management",
-  "logs",
-  "service_management"
-);
+const Logger = new TrustLogger({
+  format: "standardFormat",
+  transports: [
+    {
+      name: "kafkaTransport",
+      meta: {
+        kafkaBroker: "kafka:9092",
+        kafkaClientId: "data_management",
+        logTopic: "logs",
+      },
+    },
+    {
+      name: "consoleTransport",
+      meta: {},
+    },
+  ],
+  source: "data_management",
+});
 
 /**
  * routes for adding services, getting a list of the available services 
@@ -55,44 +67,56 @@ module.exports = Router({ mergeParams: true })
     try {
       const callback = (status, message) => {
         if(status == 200) {
-          // log the data use by the service
-          var data = {
-            owner: message.file.creator,
-            id: message.file.id,
-            name: message.file.fileName,
-          };
+          // log the data used by the service
           var serviceName = message.service.name.split("_")[1].split(".")[0];
-          Logger.log(
-            req,
-            "Use",
-            true,
-            data,
-            `service '${serviceName}' with id '${message.service.id}' used`
-          );
+          var logPayload = {
+            user_name: req.headers["x-consumer-username"],
+            user_ip: req.headers["x-real-ip"],
+            session: req.headers["cookie"]
+              .replace("session=", "")
+              .split("|")[0],
+            status: "success",
+            data_owner: message.file.creator,
+            data_id: message.file.id,
+            data_name: message.file.fileName,
+            reason: `service '${serviceName}' with id '${message.service.id}' used`,
+          };
+          Logger.log("Use", logPayload);
 
           // if external services are used log that data was shared
           const externalCallback = (externalService) => {
-            if (externalService != null)
-              Logger.log(
-                req,
-                "Share",
-                true,
-                data,
-                `shared data with external service '${externalService}'`
-              );
+            if (externalService != null) {
+              var logPayload = {
+                user_name: req.headers["x-consumer-username"],
+                user_ip: req.headers["x-real-ip"],
+                session: req.headers["cookie"].replace("session=", "").split("|")[0],
+                status: "success",
+                data_owner: message.file.creator,
+                data_id: message.file.id,
+                data_name: message.file.fileName,
+                reason: `shared data with external service '${externalService}'`,
+              };
+              Logger.log("Share", logPayload);
+            }              
           };
           serviceController.usesExternal(
             req.params.serviceId,
             externalCallback
           );
         } else {
-          Logger.log(
-            req,
-            "Use",
-            false,
-            { owner: "-", id: req.params.fileId, name: "-" },
-            `'${serviceName}' service execution failed: ${message}`
-          );
+          var logPayload = {
+            user_name: req.headers["x-consumer-username"],
+            user_ip: req.headers["x-real-ip"],
+            session: req.headers["cookie"]
+              .replace("session=", "")
+              .split("|")[0],
+            status: "failed",
+            data_owner: "-",
+            data_id: req.params.fileId,
+            data_name: "-",
+            reason: `'${serviceName}' service execution failed: ${message}`,
+          };
+          Logger.log("Use", logPayload);
         }
 
         res.status(status).send(message);
@@ -104,13 +128,17 @@ module.exports = Router({ mergeParams: true })
       );
     } catch (error) {
       console.log("error upon routing: ",error);
-      Logger.log(
-        req,
-        "Use",
-        false,
-        { owner: "-", id: req.params.fileId, name: "-" },
-        `'${serviceName}' service execution failed`
-      );
+      var logPayload = {
+        user_name: req.headers["x-consumer-username"],
+        user_ip: req.headers["x-real-ip"],
+        session: req.headers["cookie"].replace("session=", "").split("|")[0],
+        status: "failed",
+        data_owner: "-",
+        data_id: req.params.fileId,
+        data_name: "-",
+        reason: `'${serviceName}' service execution failed`,
+      };
+      Logger.log("Use", logPayload);
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,

@@ -329,7 +329,7 @@ export default {
       var dataFiltered = [];
       for (var i in this.logs) {
         var log = this.logs[i]._source;
-        if(log.category == "destroy") console.log("filter:",log)
+        console.log("filter:",log)
         if (
           (new Date(log.time)
               .toLocaleString()
@@ -352,6 +352,7 @@ export default {
           dataFiltered.push(this.logs[i]);
         }
       }
+      console.log("filter:",dataFiltered)
       return dataFiltered;
     },
   },

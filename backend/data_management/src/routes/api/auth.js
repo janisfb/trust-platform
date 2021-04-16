@@ -4,12 +4,24 @@ const TrustLogger = require("trust-logger-ba");
 
 const config = require("../../config/config");
 
-const Logger = new TrustLogger(
-  "kafka:9092",
-  "auth_management",
-  "logs",
-  "auth_management"
-);
+const Logger = new TrustLogger({
+  format: "standardFormat",
+  transports: [
+    {
+      name: "kafkaTransport",
+      meta: {
+        kafkaBroker: "kafka:9092",
+        kafkaClientId: "data_management",
+        logTopic: "logs",
+      },
+    },
+    {
+      name: "consoleTransport",
+      meta: {},
+    },
+  ],
+  source: "data_management",
+});
 
 /**
  * routes for auth service 
@@ -20,8 +32,21 @@ module.exports = Router({ mergeParams: true })
     console.log("--- login requested ---");
     try {
       const callback = (status, message) => {
-        if (status == 200)
-          Logger.log(req, "Login", true, null, "user successfully logged in");
+        if (status == 200) {
+          var logPayload = {
+            user_name: req.headers["x-consumer-username"],
+            user_ip: req.headers["x-real-ip"],
+            session: req.headers["cookie"]
+              .replace("session=", "")
+              .split("|")[0],
+            status: "success",
+            data_owner: "-",
+            data_id: "-",
+            data_name: "-",
+            reason: "user successfully logged in",
+          };
+          Logger.log("Login", logPayload);
+        }
         res.status(status).send(message);
       };
       authController.loginUser(
@@ -30,7 +55,17 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
-      Logger.log(req, "Login", false, null, "user login failed");
+      var logPayload = {
+        user_name: req.headers["x-consumer-username"],
+        user_ip: req.headers["x-real-ip"],
+        session: req.headers["cookie"].replace("session=", "").split("|")[0],
+        status: "failed",
+        data_owner: "-",
+        data_id: "-",
+        data_name: "-",
+        reason: "user login failed",
+      };
+      Logger.log("Login", logPayload);
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
@@ -42,8 +77,21 @@ module.exports = Router({ mergeParams: true })
     try {
       if (config.CONSOLE_LOGGING) console.log(req);
       const callback = (status, message) => {
-        if (status == 200)
-          Logger.log(req, "Login", true, null, "user successfully logged out");
+        if (status == 200) {
+          var logPayload = {
+            user_name: req.headers["x-consumer-username"],
+            user_ip: req.headers["x-real-ip"],
+            session: req.headers["cookie"]
+              .replace("session=", "")
+              .split("|")[0],
+            status: "failed",
+            data_owner: "-",
+            data_id: "-",
+            data_name: "-",
+            reason: "user successfully logged out",
+          };
+          Logger.log("Login", logPayload);
+        }
         res.status(status).send(message);
       };
       authController.logoutUser(
@@ -52,7 +100,17 @@ module.exports = Router({ mergeParams: true })
         callback
       );
     } catch (error) {
-      Logger.log(req, "Login", false, null, "user logout failed");
+      var logPayload = {
+        user_name: req.headers["x-consumer-username"],
+        user_ip: req.headers["x-real-ip"],
+        session: req.headers["cookie"].replace("session=", "").split("|")[0],
+        status: "failed",
+        data_owner: "-",
+        data_id: "-",
+        data_name: "-",
+        reason: "user logout failed",
+      };
+      Logger.log("Login", logPayload);
       res.status(error.statusCode || 500).json({
         status: error.status,
         message: error.message,
