@@ -23,6 +23,6 @@
     "nodemon": "^2.0.7",
     "path": "^0.12.7",
     "request": "^2.88.2",
-    "trust-logger-ba": "^0.2.12"
+    "trust-logger-ba": "^0.2.13"
   }
 }
