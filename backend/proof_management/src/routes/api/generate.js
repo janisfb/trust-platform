@@ -31,8 +31,8 @@ var infoObject = {
           reponses: {
             200: {
               description: `Returns the whole blockchain. Each block contains a timestamp, the previous hash,
-                a nonce, a data field (which itsself contains startTime, endTime and the bloom filter) 
-                and the hash of the block.`,
+                  a nonce, a data field (which itsself contains startTime, endTime and the bloom filter) 
+                  and the hash of the block.`,
             },
             "4xx/5xx": {
               description: "A message field containing the error text.",
@@ -40,6 +40,8 @@ var infoObject = {
           },
         },
       },
+    },
+    {
       "/api/proofs/verify": {
         get: {
           description:
@@ -48,15 +50,13 @@ var infoObject = {
             {
               name: "logID",
               in: "path",
-              description:
-                "The logID of the log which should be validated.",
+              description: "The logID of the log which should be validated.",
               required: false,
             },
           ],
           reponses: {
             200: {
-              description:
-                `Returns a validation message. When no parameter is passed the whole chain will be checked.
+              description: `Returns a validation message. When no parameter is passed the whole chain will be checked.
                 When the logID has been added to the path only the log associated with the ID will be checked.`,
             },
             "4xx/5xx": {
@@ -65,6 +65,7 @@ var infoObject = {
           },
         },
       },
+    },
   ],
 };
 

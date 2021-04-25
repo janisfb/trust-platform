@@ -115,7 +115,7 @@ exports.verifyLog = function(logId, resCallback) {
       }
 
       if (block == null) {
-        console.log("No block! Log possibly invalid or not proofed yet.");
+        console.log("No block! Log possibly invalid or not yet proven.");
         const response = {
           valid: false,
           status: "Unknown",

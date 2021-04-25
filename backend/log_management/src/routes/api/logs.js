@@ -38,6 +38,8 @@ var infoObject = {
           },
         },
       },
+    },
+    {
       "api/logs/shared/": {
         get: {
           description:
@@ -62,6 +64,8 @@ var infoObject = {
           },
         },
       },
+    },
+    {
       "api/logs/filter": {
         get: {
           description: "Endpoint for backend filtering of the logs.",

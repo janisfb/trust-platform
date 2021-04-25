@@ -18,9 +18,8 @@
           size="is-large"
           multilined dashed>
           <template v-slot:content>
-            <p class="pb-2">Aktionen wird automatisch ein Schweregrad zugewiesen (oben->unten =^ links->rechts):</p>
+            <p class="pb-2">Aktionen wird automatisch ein Schweregrad zugewiesen</p>
             <ul style="text-align: left;">
-              <li><b class="list-border-right mr-2">B</b>Unerwartete Ereignisse / Fehler.</li>
               <li><b class="list-border-right mr-2">1</b>Niedriges Risiko für Datensouveränität.</li>
               <li><b class="list-border-right mr-2">2</b>Mittleres Risiko für Datensouveränität.</li>
               <li><b class="list-border-right mr-2">3</b>Hohes Risiko für Datensouveränität.</li>

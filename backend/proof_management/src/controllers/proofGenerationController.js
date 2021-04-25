@@ -12,7 +12,7 @@ const Block = require("../models/Block");
  * This class is used to actually mine the block.
  */
 class internalBlock {
-  constructor(timestamp, data, prevHash = "", diff = 1) {
+  constructor(timestamp, data, prevHash = "", diff = 5) {
     this.timestamp = timestamp;
     this.data = data;
     this.prevHash = prevHash;
