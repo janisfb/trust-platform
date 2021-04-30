@@ -1,10 +1,10 @@
 _format_version: "2.1"
 
 services:
-- name: data_management
+- name: data-management
   url: http://host.docker.internal:6000
   routes:
-  - name: data_management
+  - name: data-management
     paths:
     - /api/files
     - /api/login
@@ -26,28 +26,28 @@ services:
   #   methods: [ "GET" ]
   #   strip_path: false
 
-- name: service_management
+- name: service-management
   url: http://host.docker.internal:6001
   routes:
-  - name: service_management
+  - name: service-management
     paths:
     - /api/services
     strip_path: false
     methods: [ "GET", "POST", "DELETE" ]
 
-- name: log_management
+- name: log-management
   url: http://host.docker.internal:6002
   routes:
-  - name: log_management
+  - name: log-management
     paths:
     - /api/logs
     strip_path: false
     methods: [ "GET" ]
 
-- name: proof_management
+- name: proof-management
   url: http://host.docker.internal:6003
   routes:
-  - name: proof_management
+  - name: proof-management
     paths:
     - /api/proofs
     strip_path: false

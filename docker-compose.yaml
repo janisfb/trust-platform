@@ -5,50 +5,50 @@ services:
   #   a. Backend services
   # --------------------------------------------------------------------------------
   # Manages the files (upload, delete, modify) 
-  data_management:
+  data-management:
     build: 
-      context: ./backend/data_management/
+      context: ./backend/data-management/
       target: debug #debug mode with nodemon running!
     volumes: 
-      - ./backend/data_management/src/:/work/src/
+      - ./backend/data-management/src/:/work/src/
       - ./files/:/work/files/
     ports:
       - 6000:6000
 
   # Manages the microservices (upload, use)
-  service_management:
+  service-management:
     build:
-      context: ./backend/service_management/
+      context: ./backend/service-management/
       target: debug #debug mode with nodemon running!
     volumes:
-      - ./backend/service_management/src/:/work/src/
+      - ./backend/service-management/src/:/work/src/
       - ./files/:/work/files/
       - ./microservices/:/work/services/
     ports:
       - 6001:6001
 
   # Manages the log api (get,filter etc.)
-  log_management:
+  log-management:
     build:
-      context: ./backend/log_management/
+      context: ./backend/log-management/
       target: debug #debug mode with nodemon running!
     volumes:
-      - ./backend/log_management/src/:/work/src/
+      - ./backend/log-management/src/:/work/src/
     ports:
       - 6002:6002
 
   # Manages the proof api 
-  proof_management:
+  proof-management:
     build:
-      context: ./backend/proof_management/
+      context: ./backend/proof-management/
       target: debug #debug mode with nodemon running!
     volumes:
-      - ./backend/proof_management/src/:/work/src/
+      - ./backend/proof-management/src/:/work/src/
     ports:
       - 6003:6003
 
   # Stores metadata of the exposed microservices
-  service_db:
+  service-db:
     image: mongo:latest
     restart: always
     volumes:

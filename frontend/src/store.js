@@ -230,7 +230,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * Gets the files from the data_management service
+     * Gets the files from the data-management service
      *
      * @param {*} param0
      * @returns A list containing the file information.
@@ -258,7 +258,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * Tries to get all files from the data_management service.
+     * Tries to get all files from the data-management service.
      * This also includes files that are not owned by the current user.
      * Only possible for user "admin"
      *
@@ -289,7 +289,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * Gets the services from the service_management service
+     * Gets the services from the service-management service
      *
      * @param {*} param0
      * @returns A list containing the service information.
@@ -317,7 +317,7 @@ export default new Vuex.Store({
     },
 
     /**
-     * Gets the logs from the log_management service
+     * Gets the logs from the log-management service
      *
      * @param {*} param0
      * @returns A list containing the logs.
