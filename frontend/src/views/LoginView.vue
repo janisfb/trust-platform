@@ -67,6 +67,8 @@
 </template>
 
 <script>
+import toastHelpers from '../helpers/toastHelpers.js';
+
 export default {
   name: "LoginView",
   data: function() {
@@ -114,22 +116,11 @@ export default {
         .then(() => this.$router.push("/"))
         .catch((error) => {
           this.isLoading = false;
-          this.openFailedToast();
+          this.openFailedToast("Der Nutzername oder das Passwort war falsch!");
           console.log(error);
         });
     },
-    /**
-     * Opens a toast with information about a failed login.
-     */
-    openFailedToast() {
-      this.$buefy.toast.open({
-        duration: 4000,
-        message: "Falscher Nutzername oder falsches Passwort!",
-        position: "is-bottom",
-        type: "is-danger",
-        queue: false,
-      });
-    },
+    ...toastHelpers
   },
 };
 </script>

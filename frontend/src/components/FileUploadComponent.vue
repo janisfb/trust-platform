@@ -40,6 +40,7 @@
 
 <script>
 import axios from "axios";
+import toastHelpers from '../helpers/toastHelpers.js';
 
 export default {
   name: "UploadFile",
@@ -141,20 +142,7 @@ export default {
           });
       });
     },
-    /**
-     * Opens a toast with information about a successful login.
-     * 
-     * @param {String} message - Die Nachricht, die angezeigt werden soll.
-     */
-    openSuccessToast(message) {
-      this.$buefy.toast.open({
-        duration: 4000,
-        message: message,
-        position: "is-top",
-        type: "is-success",
-        queue: false,
-      });
-    },
+    ...toastHelpers
   },
   watch: {
     /**

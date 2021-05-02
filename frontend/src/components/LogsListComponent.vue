@@ -251,6 +251,7 @@
 
 <script>
 import axios from "axios";
+import toastHelpers from '../helpers/toastHelpers.js';
 
 export default {
   name: "ServiceExplorer",
@@ -425,20 +426,7 @@ export default {
           });
       });
     },
-    /**
-     * Opens error toast.
-     * 
-     * @param {string} message The message that should be shown.
-     */
-    openFailedToast(message) {
-      this.$buefy.toast.open({
-        duration: 4000,
-        message: message,
-        position: "is-bottom",
-        type: "is-danger",
-        queue: false,
-      });
-    },
+    ...toastHelpers
   },
   /**
    * When the logsComponent is created the logs have to get loaded.

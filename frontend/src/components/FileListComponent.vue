@@ -190,6 +190,7 @@
 import axios from "axios";
 import FileUploadComponent from './FileUploadComponent.vue';
 import ServiceListComponent from './ServiceListComponent.vue';
+import toastHelpers from '../helpers/toastHelpers.js';
 
 export default {
   components: { FileUploadComponent, ServiceListComponent },
@@ -468,34 +469,6 @@ export default {
       });
     },
     /**
-     * Opens error toast.
-     * 
-     * @param {string} message The message that should be shown.
-     */
-    openFailedToast(message) {
-      this.$buefy.toast.open({
-        duration: 4000,
-        message: message,
-        position: "is-bottom",
-        type: "is-danger",
-        queue: false,
-      });
-    },
-    /**
-     * Opens success toast.
-     * 
-     * @param {string} message The message that should be shown.
-     */
-    openSuccessToast(message) {
-      this.$buefy.toast.open({
-        duration: 4000,
-        message: message,
-        position: "is-top",
-        type: "is-success",
-        queue: false,
-      });
-    },
-    /**
      * Gets called when a service has been selected in the modal containing the ServiceInfoComponent.
      * 
      * @param {*} selectedService - The service that has been selected.
@@ -511,6 +484,11 @@ export default {
     searchLogsForFile(fileId) {
       this.$router.push({ path: `/logs/filter/${fileId}` });
     },
+    /**
+     * Gets logs from the server that indicate that the data associated with fileId was shared.
+     * 
+     * @param {string} fileId - The fileId of the file that should be checked.
+     */
     getSharedInstances(fileId) {
       return new Promise((resolve, reject) => {
         axios.get(`/api/logs/shared/${fileId}`)
@@ -544,6 +522,7 @@ export default {
     clearSearchInput() {
       this.searchQuery = "";
     },
+    ...toastHelpers
   },
   /**
    * Will try to fetch the files on the created hook
