@@ -6,8 +6,8 @@ This is a concept platform developed specifically for the practical part of a ba
 ## architecture
 [UML component diagram](./Komponentendiagramm.pdf)
 
-Components:
----
+### components:
+
 * __VueFrontend:__ The frontend of the platform uses Vue.js.
 * __Kong:__ The API gateway that has been used. Includes plugins for session, auth and cors. 
 The login credentials are (test,test) and (admin,admin).
