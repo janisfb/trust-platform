@@ -4,7 +4,7 @@ A Vue.js / Express.js proof-of-concept for cloud accountability on digital platf
 This is a concept platform developed specifically for the practical part of a bachelor thesis on data sovereignty. The main idea is to use a Logger in each of the platforms backend components. The Logger can then be utilized to log every action that is performed on the data. Part of the concept is a visual representation of the recorded log messages which has been enriched with tools to explore the information they contain. 
 
 ## architecture
-![UML component diagram](./Komponentendiagramm.pdf)
+[UML component diagram](./Komponentendiagramm.pdf)
 
 Components:
 ---
