@@ -8,16 +8,16 @@ This is a concept platform developed specifically for the practical part of a ba
 
 ### components:
 
-* __VueFrontend:__ The frontend of the platform uses Vue.js.
-* __Kong:__ The API gateway that has been used. Includes plugins for session, auth and cors. 
+* __VueFrontend:__ Frontend of the platform - Vue.js.
+* __Kong:__ API gateway. Includes plugins for session, auth and cors. 
 The login credentials are (test,test) and (admin,admin).
-* __FileExplorer:__ Just a plain folder in the directory.
-* __data-management__: Service that handles all CRUD-operations for uploading files on the platform.
-* __service-management:__ Service that handles the execution of microservices on the files.
-* __log-management:__ Service that exposes the API for the retrieval of the recorded log messages.
-* __proof-management:__ Service that handles a proof-of-work-blockchain on the recorded logs.
+* __FileExplorer:__ Plain directory folder as db for files.
+* __data-management__: Service that handles all CRUD-operations for files on the platform.
+* __service-management:__ Service that handles the execution of microservices (on the files).
+* __log-management:__ Service that exposes API for the retrieval of recorded log messages.
+* __proof-management:__ Service that builds a proof-of-work-blockchain on the recorded logs.
 * __service_db:__ DB which stores metadata about the microservices.
-* __Kafka:__ Streaming platform used for the logging.
+* __Kafka:__ Streaming bus/platform for centralizing the logs.
 * __Logstash:__ Pipeline for the logs.
 * __Elasticsearch:__ DB for storing the logs.
 * __proof_db:__ DB that stores the proof-of-work-blockchain.
