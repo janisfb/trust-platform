@@ -5,6 +5,7 @@ import Buefy from 'buefy'
 import Axios from 'axios'
 import store from './store'
 import './assets/scss/app.scss'
+import "@mdi/font/css/materialdesignicons.css";
 
 Vue.use(Buefy)
 

@@ -1,29 +1,54 @@
-# Debug with nodemon running
-FROM node:15-alpine as debug
+FROM node:lts-alpine as debug
 
 # install simple http server for serving static content
-RUN npm install -g http-server
+RUN npm install -g @vue/cli
 
-WORKDIR /work/
+# make the 'app' folder the current working directory
+WORKDIR /app
 
-COPY package*.json /work/
-RUN npm install
+# copy both 'package.json' and 'package-lock.json' (if available)
+COPY package.json /app/package.json
+COPY package-lock.json /app/package.lock.json
 
-COPY ./src/ /work/src/
+# install project dependencies
+RUN npm install --silent
 
-ENTRYPOINT [ "npm","run","serve" ]
+# copy project files and folders to the current working directory (i.e. 'app' folder)
 
-# Prod 
-FROM node:15-alpine as prod
-
-WORKDIR /work/
-
-COPY package*.json /work/
-RUN npm install
-
-COPY ./src/ /work/src/
-
-RUN npm run build
+COPY ./ .
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD ["npm", "run", "serve"]
+
+# # Debug with nodemon running
+# FROM node:15-alpine as debug
+
+# # install simple http server for serving static content
+# RUN npm install -g http-server
+
+# WORKDIR /work/
+
+# COPY package*.json /work/
+# RUN npm install
+
+# COPY ./ /work/
+
+# ENTRYPOINT [ "npm","run","serve" ]
+
+# # Prod 
+# FROM node:15-alpine as prod
+
+# # install simple http server for serving static content
+# RUN npm install -g http-server
+
+# WORKDIR /work/
+
+# COPY package*.json /work/
+# RUN npm install
+
+# COPY ./src/ /work/src/
+
+# RUN npm run build
+
+# EXPOSE 8080
+# CMD [ "http-server", "dist" ]

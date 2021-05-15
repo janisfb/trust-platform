@@ -12,14 +12,15 @@ mongoose
   .connect(config.DB_LINK, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 50000,
+    serverSelectionTimeoutMS: 100000,
   })
   .then(() => console.log("MongoDB connected successfully!"))
   .catch((err) =>
     console.log("error while establishing connection to mongo db", err)
   );
 
-// every fifth minute
+// every fifth minute a new block will be created
+//  -> containing all logs of the past five minutes
 var blockGenJob = new CronJob(
   "*/5 * * * *",
   function () {

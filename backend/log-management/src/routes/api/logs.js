@@ -1,7 +1,5 @@
 const Router = require("express").Router;
-const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
 const logController = require("../../controllers/logController");
-const config = require("../../config/config");
 
 var infoObject = {
   info: {

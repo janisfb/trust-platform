@@ -8,7 +8,7 @@ services:
   data-management:
     build: 
       context: ./backend/data-management/
-      target: debug #debug mode with nodemon running!
+      target: prod #debug for debug mode with nodemon running!
     volumes: 
       - ./backend/data-management/src/:/work/src/
       - ./files/:/work/files/
@@ -19,7 +19,7 @@ services:
   service-management:
     build:
       context: ./backend/service-management/
-      target: debug #debug mode with nodemon running!
+      target: prod #debug for debug mode with nodemon running!
     volumes:
       - ./backend/service-management/src/:/work/src/
       - ./files/:/work/files/
@@ -31,7 +31,7 @@ services:
   log-management:
     build:
       context: ./backend/log-management/
-      target: debug #debug mode with nodemon running!
+      target: prod #debug for debug mode with nodemon running!
     volumes:
       - ./backend/log-management/src/:/work/src/
     ports:
@@ -41,11 +41,13 @@ services:
   proof-management:
     build:
       context: ./backend/proof-management/
-      target: debug #debug mode with nodemon running!
+      target: prod #debug for debug mode with nodemon running!
     volumes:
       - ./backend/proof-management/src/:/work/src/
     ports:
       - 6003:6003
+    depends_on:
+      - service-db
 
   # Stores metadata of the exposed microservices
   service-db:
@@ -59,15 +61,15 @@ services:
   # -------------------------------------------------------------------------------- 
   #   b. frontend
   # --------------------------------------------------------------------------------
-  # # vue frontend // platform
-  # frontend:
-  #   build:
-  #     context: ./frontend/
-  #     target: debug #debug mode with serve
-  #   volumes:
-  #     - ./frontend/src/:/work/src/
-  #   ports: 
-  #     - 8080:8080
+  # vue frontend // platform
+  frontend:
+    build:
+      context: ./frontend/
+      target: debug #debug for debug mode with serve
+    volumes:
+      - ./frontend/src/:/work/src/
+    ports: 
+      - 8080:8080
 
   # -------------------------------------------------------------------------------- 
   #   c. Full Kafka setup
@@ -107,7 +109,7 @@ services:
       - kafka
 
   # -------------------------------------------------------------------------------- 
-  #   c. ELK Stack
+  #   d. ELK Stack
   #       - Logstash
   #       - Elasticsearch
   #       - Kibana
@@ -145,7 +147,7 @@ services:
     # It Links kibana container & elasticsearch container to communicate
     links:
       - elasticsearch:elasticsearch
-    # You can control the order of service startup and shutdown with the depends_on option.
+    # control the order of service startup and shutdown with depends_on option.
     depends_on: 
       - elasticsearch
 

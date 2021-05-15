@@ -108,6 +108,7 @@ const getFile = (fileId, resCallback) => {
   //   resCallback(404, `No file found for ${fileId}.`);
   //   return;
   // }
+  
   if (!fs.existsSync(fileUploadPath)) {
     resCallback(404, `No file found for id ${reqFileId}.`);
     return;

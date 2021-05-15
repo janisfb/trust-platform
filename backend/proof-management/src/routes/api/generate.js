@@ -8,8 +8,8 @@ var infoObject = {
     title: "proof-management API",
     summary: "API to retrieve proofs for log-management API.",
     description: `This API can be used to validate log-messages created by the log-management service.
-      For this task a simple blockchain is used. Each block saves a bloomfilter containing all logs
-      that were generated between the startTime and endTime that is saved in the data field. The API
+      For this task a simple blockchain is used. Each block has a bloomfilter containing all logs
+      that were generated between the startTime and endTime (saved in the data field). The API
       gives access to validation tools to a) validate the whole chain or b) validate a single log.`,
     termsOfService: "Not Applicable",
     contact: {
