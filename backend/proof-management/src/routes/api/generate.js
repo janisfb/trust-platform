@@ -10,7 +10,8 @@ var infoObject = {
     description: `This API can be used to validate log-messages created by the log-management service.
       For this task a simple blockchain is used. Each block has a bloomfilter containing all logs
       that were generated between the startTime and endTime (saved in the data field). The API
-      gives access to validation tools to a) validate the whole chain or b) validate a single log.`,
+      gives access to validation tools to a) validate the whole chain or b) validate a single log.
+      Note that it can take up to 5 minutes to validate a log message.`,
     termsOfService: "Not Applicable",
     contact: {
       name: "API Support",

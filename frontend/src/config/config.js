@@ -1,4 +1,4 @@
 module.exports = {
-  //the port the app will be using
+  // control console logging
   CONSOLE_LOGGING: process.env.CONSOLE_LOGGING || false,
 };

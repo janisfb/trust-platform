@@ -33,8 +33,24 @@ The endpoints are:
 * __Log-API:__ http://localhost:8080/api/logs
 * __Proof-API:__ http://localhost:8080/api/proofs
 
-Problems with logstash:
+---
+### known problems
+**Problems with logstash:**
 Logstash requires a minimum amount of allocated memory. The error can be fixed with:
 ``` bash
 sysctl -w vm.max_map_count=262144
 ```
+
+**Problems with docker containers:**
+Especially at first build/start timeouts can occur. The database connection between MongoDB and the Express.js-apps or the connection between the message bus and pipeline could fail. In this case a rebuild/restart of all containers will usually solve the problems.
+
+---
+## notes
+The platform has been tested on the following platforms:
+| OS | details |
+| ------ | ----------- |
+| Windows 10 (20H2)   | i5-6500 Quad-Core (3.2 GHz); 16 GB RAM; Docker version 20.10.5, build 55c4c88, WSL2 backend (Ubuntu)|                                      
+| macOS (10.15.3) | i5 Dual-Core (2.3 GHz); 8 GB RAM; Docker version 20.10.6, build 370c289, ressources set to: 3 cores, 4GB memory, 2GB swap  |
+
+---
+Note that this is not a release version. The frontend was optimised for an aspect ration of 16:9 (1920x1080px).

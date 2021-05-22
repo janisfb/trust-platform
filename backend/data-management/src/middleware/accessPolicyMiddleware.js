@@ -3,6 +3,15 @@ const config = require("../config/config");
 const fs = require("fs");
 
 module.exports = {
+  /**
+   * Rudimental authorization check for file access.
+   * If admin tries to access a file: allow
+   * Else: Only allow if user is file owner
+   * 
+   * @param {*} req
+   * @param {*} res
+   * @param {*} next
+   */
   isAccessAuthorized(req, res, next) {
     try {
       const username = req.headers["x-consumer-username"];

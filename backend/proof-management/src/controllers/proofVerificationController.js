@@ -4,7 +4,6 @@ const { BloomFilter } = require("bloom-filters");
 const { Client } = require("@elastic/elasticsearch");
 const client = new Client({ node: "http://elasticsearch:9200" });
 
-var config = require("../config/config");
 const Block = require("../models/Block");
 
 /**

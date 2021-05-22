@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+/**
+ * Block schema in DB
+ */
 const BlockSchema = new Schema({
   timestamp: {
     type: Date,

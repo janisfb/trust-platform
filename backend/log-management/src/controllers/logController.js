@@ -10,7 +10,7 @@ var config = require("../config/config");
 
 /**
  * Gets all the logs that are associated to the user.
- * These could be logs created by actions of the user himself or log
+ *  These could be logs created by actions of the user himself or logs
  *  containing data that is owned by the user.
  *
  * @param {string} reqUsername The username of the user that is requesting the logs.
@@ -25,8 +25,8 @@ exports.getUserLogs = function (reqUsername, resCallback) {
         size: 5000,
         query: {
           multi_match: {
-            query: reqUsername,
-            fields: ["user_name", "data_owner"],
+            query: reqUsername, // if at least one of the fields includes reqUsername
+            fields: ["user_name", "data_owner"], // include in response
           },
         },
       },
@@ -55,7 +55,7 @@ exports.getUserLogs = function (reqUsername, resCallback) {
 
 /**
  * Gets the log entries for the fileId that are associated with file sharing.
- * 
+ *
  * @param {string} reqUsername The username of the current user.
  * @param {string} dataId The fileId of the file.
  * @param {*} resCallback The callback for the Router containing the status and message.
@@ -72,13 +72,13 @@ exports.getSharedInstances = function (reqUsername, dataId, resCallback) {
             must: [
               {
                 multi_match: {
-                  query: reqUsername,
-                  fields: ["user_name", "data_owner"],
+                  query: reqUsername, // if at least one of the fields includes reqUsername
+                  fields: ["user_name", "data_owner"], // include in response
                 },
               },
               {
                 multi_match: {
-                  query: "share",
+                  query: "share", // only include logs with category "share"
                   fields: ["category"],
                 },
               },
@@ -116,13 +116,13 @@ exports.getSharedInstances = function (reqUsername, dataId, resCallback) {
 
 /**
  * Allows filtering of logs.
- * 
+ *
  * @param {string} reqUsername The username of the current user.
  * @param {*} reqQuery The query with the query parameters for the filters.
  * @param {*} resCallback The callback for the Router containing the status and message.
  */
-exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
-  if(!reqQuery || Object.keys(reqQuery).length === 0) {
+exports.filterLogs = function (reqUsername, reqQuery, resCallback) {
+  if (!reqQuery || Object.keys(reqQuery).length === 0) {
     resCallback(
       404,
       "Request contained no queries for filtering. Possible queries: prios, categories, dataId."
@@ -130,6 +130,7 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
     return;
   }
 
+  // default to all prios if no prio was provided
   var prios = [1, 2, 3, 4];
   if (reqQuery.prios != undefined) {
     prios = reqQuery.prios.split(",");
@@ -141,7 +142,8 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
       priority: prios,
     },
   });
-  
+
+  // add categories to filter (filter by category)
   if (reqQuery.categories != undefined) {
     categories = reqQuery.categories.split(",");
     queries.push({
@@ -151,6 +153,7 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
     });
   }
 
+  // add dataIDs to filter (filter by file ID)
   if (reqQuery.dataId != undefined) {
     queries.push({
       term: {
@@ -158,16 +161,18 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
       },
     });
   }
- 
+
+  // add data names to filter (filter by file name)
   if (reqQuery.dataName != undefined) {
     queries.push({
-      query_string:{  
-         default_field:"data_name",
-         query:`*${reqQuery.dataName}*`
+      query_string: {
+        default_field: "data_name",
+        query: `*${reqQuery.dataName}*`,
       },
     });
   }
 
+  // add session id to filter (filter by session id)
   if (reqQuery.session != undefined) {
     queries.push({
       query_string: {
@@ -177,6 +182,7 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
     });
   }
 
+  // add user name to filter (filter by user name)
   if (reqQuery.user != undefined) {
     queries.push({
       query_string: {
@@ -186,6 +192,7 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
     });
   }
 
+  // add user ip to filter (filter by user ip)
   if (reqQuery.user_ip != undefined) {
     queries.push({
       query_string: {
@@ -205,13 +212,11 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
           bool: {
             must: {
               multi_match: {
-                query: reqUsername,
-                fields: ["user_name", "data_owner"],
+                query: reqUsername, // if at least one of the fields includes reqUsername
+                fields: ["user_name", "data_owner"], // include in response
               },
             },
-            must: [
-              queries,
-            ],
+            must: [queries], // add filters to search request
           },
         },
       },
@@ -236,4 +241,4 @@ exports.filterLogs = function(reqUsername, reqQuery, resCallback) {
       resCallback(200, response);
     }
   );
-}
+};

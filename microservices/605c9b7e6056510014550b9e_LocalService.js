@@ -1,3 +1,6 @@
+/**
+ * Local service that will count the characters in the file buffer
+ */
 module.exports = {
   execute: ({ filebuffer, filename }, serviceCallback) => {
     const request = require("request");

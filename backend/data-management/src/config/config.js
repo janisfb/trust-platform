@@ -1,5 +1,5 @@
 module.exports = {
-  //the port the app will be using
+  //the port the app will be using (NOTE: this is not the port Kong will expose)
   PORT: process.env.PORT || 6000,
   //max upload size for user uploads
   FILE_SIZE: process.env.FILE_SIZE || 50 * 1024 * 1024,

@@ -1,3 +1,4 @@
+// Service that uploads a file to file.io
 module.exports = {
   execute: ({ filebuffer, filename }, serviceCallback) => {
     const request = require("request");

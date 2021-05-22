@@ -1,3 +1,4 @@
+// Service that sends the text in the file buffer to shoutcloud.io
 module.exports = {
   execute: ({ filebuffer, filename }, serviceCallback) => {
     const request = require("request");

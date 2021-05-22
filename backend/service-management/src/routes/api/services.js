@@ -5,8 +5,6 @@ const serviceExecutionController = require("../../controllers/serviceExecutionCo
 const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware");
 const TrustLogger = require("trust-logger-ba");
 
-const config = require("../../config/config");
-
 const Logger = new TrustLogger({
   format: "standardFormat",
   transports: [

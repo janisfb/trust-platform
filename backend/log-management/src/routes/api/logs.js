@@ -5,12 +5,12 @@ var infoObject = {
   info: {
     title: "log-management API",
     summary: "API to retrieve logs.",
-    description: `This API can be used to retrieve the log files associated to the current user.
-      The 'logs'-field of this response already contains all the log messages for you. This API can also 
-      be used to filter the logs.`,
+    description: `This API can be used to retrieve the log files associated with the current user.
+      The 'logs'-field of this response already contains all the log messages. This API can also 
+      be used to filter logs.`,
     termsOfService: "Not Applicable",
     contact: {
-      name: "API Support",
+      name: "API Support (example values)",
       url: "https://www.example.com/support",
       email: "support@example.com",
     },
@@ -24,7 +24,7 @@ var infoObject = {
     {
       "/api/logs": {
         get: {
-          description: "The endpoint you have just visited.",
+          description: "The endpoint you have just visited. Returns OpenAPI description and logs for user.",
           reponses: {
             200: {
               description:
@@ -41,7 +41,7 @@ var infoObject = {
       "api/logs/shared/": {
         get: {
           description:
-            "Endpoint for logs that document a sharing of the file with the ID dataId.",
+            "Endpoint for logs that document a transfer of the file (shared to other API) with the ID dataId.",
           parameters: [
             {
               name: "dataId",

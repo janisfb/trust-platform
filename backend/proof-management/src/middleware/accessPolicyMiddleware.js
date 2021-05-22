@@ -1,7 +1,8 @@
 
 module.exports = {
   /**
-   * Checks if user accessing is the "admin" user
+   * Checks if user accessing is the "admin" user.
+   * 
    * @param {*} req 
    * @param {*} res 
    * @param {*} next 

@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+/**
+ * Service schema in DB
+ */
 const ServiceSchema = new Schema({
   _id: {
     type: String,

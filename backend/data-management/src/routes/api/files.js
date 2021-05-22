@@ -3,8 +3,6 @@ const accessPolicyMiddleware = require("../../middleware/accessPolicyMiddleware"
 const fileController = require("../../controllers/fileController");
 const TrustLogger = require("trust-logger-ba");
 
-const config = require("../../config/config");
-
 const Logger = new TrustLogger({
     format: "standardFormat",
     transports: [
@@ -35,7 +33,6 @@ module.exports = Router({ mergeParams: true })
   .post("/files", async (req, res, next) => {
     try {
       const callback = (status, message) => {
-        // trigger log message
         if (status == 200) {
           var logPayload = {
             user_name: req.headers["x-consumer-username"],
@@ -84,7 +81,6 @@ module.exports = Router({ mergeParams: true })
   .get("/files", async (req, res, next) => {
     try {
       const callback = (status, message) => {
-        // trigger log message
         if (status == 200) {
           var data = [];
           message.forEach((obj) =>
@@ -149,7 +145,6 @@ module.exports = Router({ mergeParams: true })
   .get("/files/all", async (req, res, next) => {
     try {
       const callback = (status, message) => {
-        // trigger log message
         if (status == 200) {
           var data = [];
           message.forEach((obj) =>
@@ -217,7 +212,6 @@ module.exports = Router({ mergeParams: true })
     async (req, res, next) => {
       try {
         const callback = (status, message) => {
-          // trigger log message
           if (status == 200) {
             var logPayload = {
               user_name: req.headers["x-consumer-username"],
@@ -270,7 +264,6 @@ module.exports = Router({ mergeParams: true })
     async (req, res, next) => {
       try {
         const callback = (status, message) => {
-          // trigger log message
           if (status == 200) {
             var logPayload = {
               user_name: req.headers["x-consumer-username"],

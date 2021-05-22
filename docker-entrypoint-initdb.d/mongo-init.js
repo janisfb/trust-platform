@@ -1,3 +1,5 @@
+// initialisation script for MongoDB
+//  will create a few service entries
 print(
   "Start init #################################################################"
 );

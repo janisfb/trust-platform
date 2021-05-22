@@ -23,10 +23,6 @@
               </div>
             </div>
           </div>
-          <!-- <h1>{{ serviceElement.serviceMeta.name }}</h1>
-          <b-tag type="is-info ml-3" style="align-self:center;">
-            {{ serviceElement.serviceMeta.version }}
-          </b-tag> -->
         </div>
       </div>
     </section>
