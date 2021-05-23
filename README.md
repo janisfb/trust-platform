@@ -54,3 +54,6 @@ The platform has been tested on the following platforms:
 
 ---
 Note that this is not a release version. The frontend was optimised for an aspect ration of 16:9 (1920x1080px).
+
+---
+### [Github Page](https://github.com/janisfb/trust-platform)
